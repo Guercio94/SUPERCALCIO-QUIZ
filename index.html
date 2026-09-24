@@ -16,7 +16,7 @@ button:hover{transform:translateY(-1px);background:#215337}.selected{background:
 .start{width:100%;margin-top:16px;background:#0aa957;font-size:17px;padding:16px}.start:hover{background:#0bc46a}
 .tag{display:inline-block;background:#183d29;border-radius:999px;padding:6px 10px;font-size:12px;color:#bce9cd}
 .hidden{display:none}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.timer{font-size:20px;font-weight:900;color:#ffd45c}.score{font-weight:800}.bar{height:7px;background:#173a28;border-radius:99px;overflow:hidden;margin:12px 0 22px}.fill{height:100%;background:#10b966;width:0%;transition:.25s}
-.question{font-size:22px;line-height:1.25;font-weight:900;margin:18px 0}.answers{display:grid;gap:10px}.answer{text-align:left;font-size:15px;padding:16px}.correct{background:#137a42!important;border-color:#5be39b!important}.wrong{background:#9e2730!important;border-color:#ff7a82!important}.feedback{margin-top:14px;padding:15px;border-radius:14px;background:#0a1d13;text-align:center;font-weight:800}.feedback small{display:block;color:#b8d2c2;margin-top:6px;font-weight:600}.result{text-align:center}.big{font-size:46px;font-weight:900;color:#62e69c;margin:8px}.restart{margin-top:15px;width:100%}
+.question{font-size:22px;line-height:1.25;font-weight:900;margin:18px 0}.answers{display:grid;gap:10px}.answer{text-align:left;font-size:15px;padding:16px}.correct{background:#137a42!important;border-color:#5be39b!important}.wrong{background:#9e2730!important;border-color:#ff7a82!important}.feedback{margin-top:14px;padding:15px;border-radius:14px;background:#0a1d13;text-align:center;font-weight:800}.feedback small{display:block;color:#b8d2c2;margin-top:6px;font-weight:600}.result{text-align:center}.big{font-size:46px;font-weight:900;color:#62e69c;margin:8px}.restart{margin-top:15px;width:100%}.mini{font-size:12px;color:#9ec1ad;text-align:center;margin-top:8px}.streak{font-size:13px;font-weight:800;color:#ffd45c}
 @media(max-width:390px){.grid{grid-template-columns:1fr}.question{font-size:20px}}
 </style>
 </head>
@@ -42,6 +42,7 @@ button:hover{transform:translateY(-1px);background:#215337}.selected{background:
       <h2 style="margin-top:20px">⚔️ Modalità</h2>
       <div class="grid" id="modes"></div>
       <button type="button" class="start" id="startBtn">INIZIA IL QUIZ</button>
+      <div class="mini">10 domande · 15 secondi · fino a 125 punti per risposta</div>
     </div>
   </section>
 
@@ -75,32 +76,68 @@ let selectedCat="🌍 Misto", selectedDiff="🟢 Facile", selectedMode="🎮 Sol
 let questions=[], index=0, score=0, timer=15, locked=false, interval;
 
 const bank = [
-["Serie A","Quale squadra gioca le proprie partite interne a San Siro insieme al Milan?","Inter","Juventus","Roma","Napoli"],
-["Serie A","Quanti punti vale normalmente una vittoria in Serie A?","3","2","1","4"],
-["Champions League","Quale squadra ha vinto la Champions League 2009-10?","Inter","Barcelona","Bayern Monaco","Manchester United"],
-["Champions League","Chi è il miglior marcatore storico della Champions League?","Cristiano Ronaldo","Lionel Messi","Robert Lewandowski","Raúl"],
-["Mondiali","Quale nazionale ha vinto il Mondiale 2022?","Argentina","Francia","Brasile","Germania"],
-["Mondiali","Chi segnò il gol decisivo nella finale del Mondiale 2010?","Andrés Iniesta","David Villa","Xavi","Fernando Torres"],
-["Europei","Quale nazionale vinse Euro 2020, torneo disputato nel 2021?","Italia","Inghilterra","Francia","Spagna"],
-["Europei","Quale nazionale vinse Euro 1992?","Danimarca","Germania","Olanda","Svezia"],
-["Premier League","Quale stadio è la casa del Manchester United?","Old Trafford","Anfield","Emirates Stadium","Stamford Bridge"],
-["La Liga","In quale città si trova il Camp Nou?","Barcellona","Madrid","Valencia","Siviglia"],
-["Bundesliga","Quale club tedesco è noto come Die Roten?","Bayern Monaco","Borussia Dortmund","Schalke 04","Werder Brema"],
-["Ligue 1","Quale club francese gioca al Parc des Princes?","Paris Saint-Germain","Monaco","Lione","Marsiglia"],
-["Giocatori","Quale giocatore è soprannominato La Pulga?","Lionel Messi","Neymar","Kaká","Luis Suárez"],
-["Giocatori","Quale attaccante è noto come Il Fenomeno?","Ronaldo Nazário","Ronaldinho","Romário","Adriano"],
-["Squadre","Quale club è soprannominato I Reds?","Liverpool","Arsenal","Chelsea","Tottenham"],
-["Squadre","Quale club è soprannominato I Blaugrana?","Barcelona","Real Madrid","Atlético Madrid","Valencia"],
-["Storia del calcio","Chi allenò il Porto alla vittoria della Champions League 2003-04?","José Mourinho","Pep Guardiola","Carlo Ancelotti","Fabio Capello"],
-["Storia del calcio","Quale club vinse la prima Coppa dei Campioni nel 1956?","Real Madrid","Milan","Benfica","Inter"],
-["Record e statistiche","Quali due giocatori condivisero il titolo di capocannoniere del Mondiale 1994?","Stoichkov e Salenko","Romário e Baggio","Bebeto e Klinsmann","Batistuta e Baggio"],
-["Record e statistiche","Quale giocatore ha vinto il Pallone d'Oro nel 1991?","Jean-Pierre Papin","Lothar Matthäus","Marco van Basten","Roberto Baggio"],
-["Serie A","Quale club vinse la Coppa UEFA 1990-91?","Inter","Roma","Juventus","Napoli"],
-["Mondiali","Quale nazionale vinse il Mondiale 2006?","Italia","Francia","Germania","Brasile"],
-["Champions League","Chi segnò la doppietta dell'Inter nella finale di Champions League 2010?","Diego Milito","Samuel Eto'o","Wesley Sneijder","Maicon"],
-["Storia del calcio","Quale club italiano vinse la Coppa dei Campioni 1984-85?","Juventus","Milan","Inter","Roma"]
+["Serie A","Facile","Quanti punti vale normalmente una vittoria in Serie A?","3","2","1","4"],
+["Serie A","Facile","Quale squadra gioca le proprie partite interne a San Siro insieme al Milan?","Inter","Juventus","Roma","Napoli"],
+["Serie A","Facile","Quale squadra è soprannominata La Vecchia Signora?","Juventus","Milan","Lazio","Torino"],
+["Serie A","Media","Quale club vinse la Coppa UEFA 1990-91?","Inter","Roma","Juventus","Napoli"],
+["Serie A","Media","Quale squadra ha come colori tradizionali il giallo e il rosso?","Roma","Lazio","Napoli","Atalanta"],
+["Serie A","Difficile","Quale allenatore guidò l'Inter al Triplete nel 2010?","José Mourinho","Roberto Mancini","Rafael Benítez","Marcello Lippi"],
+["Serie A","Difficile","Quale club vinse lo Scudetto 1984-85?","Verona","Juventus","Roma","Torino"],
+["Serie A","Esperto","Quale club vinse il primo campionato italiano di calcio nel 1898?","Genoa","Milan","Juventus","Pro Vercelli"],
+["Champions League","Facile","Quale squadra ha vinto la Champions League 2009-10?","Inter","Barcelona","Bayern Monaco","Manchester United"],
+["Champions League","Facile","Chi è il miglior marcatore storico della Champions League?","Cristiano Ronaldo","Lionel Messi","Robert Lewandowski","Raúl"],
+["Champions League","Media","Chi segnò la doppietta dell'Inter nella finale di Champions League 2010?","Diego Milito","Samuel Eto'o","Wesley Sneijder","Maicon"],
+["Champions League","Media","Quale club ha vinto la finale del 1999 segnando due gol nei minuti di recupero?","Manchester United","Bayern Monaco","Real Madrid","Juventus"],
+["Champions League","Difficile","Quale squadra vinse la Champions League nel 2004?","Porto","Monaco","Milan","Deportivo La Coruña"],
+["Champions League","Difficile","Chi segnò il gol del 2-1 nella finale 2005 tra Milan e Liverpool?","Vladimir Smicer","Hernán Crespo","Xabi Alonso","Andriy Shevchenko"],
+["Champions League","Esperto","Quale club ha vinto più Coppe dei Campioni/Champions League?","Real Madrid","Milan","Liverpool","Bayern Monaco"],
+["Mondiali","Facile","Quale nazionale ha vinto il Mondiale 2022?","Argentina","Francia","Brasile","Germania"],
+["Mondiali","Facile","Quale nazionale vinse il Mondiale 2006?","Italia","Francia","Germania","Brasile"],
+["Mondiali","Media","Chi segnò il gol decisivo nella finale del Mondiale 2010?","Andrés Iniesta","David Villa","Xavi","Fernando Torres"],
+["Mondiali","Media","In quale anno si disputò il primo Mondiale?","1930","1928","1934","1938"],
+["Mondiali","Difficile","Quale nazionale vinse il Mondiale 1978?","Argentina","Paesi Bassi","Brasile","Italia"],
+["Mondiali","Difficile","Chi segnò il gol della Mano de Dios nel 1986?","Diego Maradona","Jorge Valdano","Pelé","Gary Lineker"],
+["Mondiali","Esperto","Quale nazionale ha disputato più finali del Mondiale?","Germania","Brasile","Italia","Argentina"],
+["Europei","Facile","Quale nazionale vinse Euro 2020, torneo disputato nel 2021?","Italia","Inghilterra","Francia","Spagna"],
+["Europei","Facile","Quale nazionale vinse Euro 1992?","Danimarca","Germania","Olanda","Svezia"],
+["Europei","Media","Chi segnò il rigore decisivo per l'Italia nella finale di Euro 2020?","Mancini","Jorginho","Bonucci","Donnarumma"],
+["Europei","Media","Quale nazionale vinse Euro 2004?","Grecia","Portogallo","Spagna","Francia"],
+["Europei","Difficile","Chi segnò il gol dell'Italia nella finale di Euro 1968?","Luigi Riva","Pietro Anastasi","Gigi Meroni","Sandro Mazzola"],
+["Europei","Esperto","Quale nazionale ha vinto più volte gli Europei insieme alla Spagna?","Germania","Francia","Italia","Portogallo"],
+["Premier League","Facile","Quale stadio è la casa del Manchester United?","Old Trafford","Anfield","Emirates Stadium","Stamford Bridge"],
+["Premier League","Facile","Quale club è soprannominato The Reds?","Liverpool","Chelsea","Arsenal","Everton"],
+["Premier League","Media","Quale squadra ha vinto la Premier League 2015-16?","Leicester City","Chelsea","Arsenal","Manchester City"],
+["Premier League","Media","Chi è il miglior marcatore storico della Premier League?","Alan Shearer","Wayne Rooney","Harry Kane","Thierry Henry"],
+["Premier League","Difficile","Quale allenatore guidò il Leicester al titolo 2015-16?","Claudio Ranieri","José Mourinho","Arsène Wenger","Brendan Rodgers"],
+["La Liga","Facile","In quale città si trova il Camp Nou?","Barcellona","Madrid","Valencia","Siviglia"],
+["La Liga","Facile","Quale club è soprannominato Los Blancos?","Real Madrid","Barcelona","Valencia","Sevilla"],
+["La Liga","Media","Quale squadra vinse La Liga 2020-21?","Atlético Madrid","Real Madrid","Barcelona","Sevilla"],
+["La Liga","Difficile","Chi è il miglior marcatore storico della Liga?","Lionel Messi","Cristiano Ronaldo","Karim Benzema","Telmo Zarra"],
+["Bundesliga","Facile","Quale club tedesco è noto come Die Roten?","Bayern Monaco","Borussia Dortmund","Schalke 04","Werder Brema"],
+["Bundesliga","Facile","Quale club gioca al Signal Iduna Park?","Borussia Dortmund","Bayern Monaco","Bayer Leverkusen","RB Lipsia"],
+["Bundesliga","Media","Quale squadra vinse la Bundesliga 2023-24 interrompendo il dominio del Bayern?","Bayer Leverkusen","Borussia Dortmund","Stoccarda","RB Lipsia"],
+["Ligue 1","Facile","Quale club francese gioca al Parc des Princes?","Paris Saint-Germain","Monaco","Lione","Marsiglia"],
+["Ligue 1","Media","Quale club ha sede nel Principato di Monaco?","Monaco","Lione","Nizza","Nantes"],
+["Giocatori","Facile","Quale giocatore è soprannominato La Pulga?","Lionel Messi","Neymar","Kaká","Luis Suárez"],
+["Giocatori","Facile","Quale attaccante è noto come Il Fenomeno?","Ronaldo Nazário","Ronaldinho","Romário","Adriano"],
+["Giocatori","Media","Quale portiere italiano è soprannominato Superman?","Gianluigi Buffon","Dino Zoff","Walter Zenga","Francesco Toldo"],
+["Giocatori","Media","Quale giocatore è noto come King Eric?","Eric Cantona","Eric Abidal","Eric Bailly","David Beckham"],
+["Giocatori","Difficile","Quale giocatore vinse il Pallone d'Oro 1991?","Jean-Pierre Papin","Lothar Matthäus","Marco van Basten","Roberto Baggio"],
+["Giocatori","Esperto","Quale giocatore ha vinto il Pallone d'Oro nel 1960?","Luis Suárez Miramontes","Alfredo Di Stéfano","Ferenc Puskás","Raymond Kopa"],
+["Squadre","Facile","Quale club è soprannominato I Reds?","Liverpool","Arsenal","Chelsea","Tottenham"],
+["Squadre","Facile","Quale club è soprannominato I Blaugrana?","Barcelona","Real Madrid","Atlético Madrid","Valencia"],
+["Squadre","Media","Quale club italiano è soprannominato I Giallorossi?","Roma","Lecce","Palermo","Bologna"],
+["Squadre","Difficile","Quale club portoghese è soprannominato Dragões?","Porto","Benfica","Sporting CP","Braga"],
+["Storia del calcio","Facile","Chi allenò il Porto alla vittoria della Champions League 2003-04?","José Mourinho","Pep Guardiola","Carlo Ancelotti","Fabio Capello"],
+["Storia del calcio","Facile","Quale club vinse la prima Coppa dei Campioni nel 1956?","Real Madrid","Milan","Benfica","Inter"],
+["Storia del calcio","Media","Quale club italiano vinse la Coppa dei Campioni 1984-85?","Juventus","Milan","Inter","Roma"],
+["Storia del calcio","Difficile","Quale nazione vinse il primo Europeo per nazionali nel 1960?","Unione Sovietica","Jugoslavia","Spagna","Francia"],
+["Storia del calcio","Esperto","In quale anno fu fondata la FIFA?","1904","1896","1910","1920"],
+["Record e statistiche","Media","Quali due giocatori condivisero il titolo di capocannoniere del Mondiale 1994?","Stoichkov e Salenko","Romário e Baggio","Bebeto e Klinsmann","Batistuta e Baggio"],
+["Record e statistiche","Difficile","Quale giocatore ha segnato più gol in una singola edizione del Mondiale?","Just Fontaine","Ronaldo","Gerd Müller","Miroslav Klose"],
+["Record e statistiche","Difficile","Quale nazionale ha segnato più gol nella storia dei Mondiali fino al 2022?","Brasile","Germania","Argentina","Italia"],
+["Record e statistiche","Esperto","Chi detiene il record di presenze ai Mondiali?","Lionel Messi","Lothar Matthäus","Miroslav Klose","Cafu"]
 ];
-
 
 function buildButtons(id, arr, setter){
  const el=document.getElementById(id);
@@ -119,6 +156,7 @@ function buildButtons(id, arr, setter){
    if(i===0)b.classList.add("selected");
  });
 }
+
 buildButtons("categories",categories,x=>selectedCat=x);
 buildButtons("difficulties",diffs,x=>selectedDiff=x);
 buildButtons("modes",modes,x=>selectedMode=x);
@@ -128,18 +166,20 @@ function startQuiz(){
  if(!questions) questions=[];
  // La modalità 1 vs 1 è già selezionabile; il collegamento online verrà aggiunto dopo.
  const cat=selectedCat.replace(/^\S+\s+/, "").trim();
+ const diff=selectedDiff.replace(/^\S+\s+/, "").trim();
  let pool=cat==="Misto"?bank:bank.filter(q=>q[0]===cat);
- // Se una categoria non ha ancora 10 domande, completa con domande miste.
- if(pool.length<10){
-   const extra=bank.filter(q=>!pool.includes(q)).sort(()=>Math.random()-0.5);
-   pool=pool.concat(extra);
- }
- questions=[...pool].sort(()=>Math.random()-0.5).slice(0,10);
+ let byDiff=pool.filter(q=>q[1]===diff);
+ // Se la categoria/difficoltà non ha abbastanza domande, completa mantenendo la difficoltà scelta.
+ if(byDiff.length<10) byDiff=byDiff.concat(bank.filter(q=>q[1]===diff && !byDiff.includes(q)));
+ if(byDiff.length<10) byDiff=byDiff.concat(pool.filter(q=>!byDiff.includes(q)));
+ if(byDiff.length<10) byDiff=byDiff.concat(bank.filter(q=>!byDiff.includes(q)));
+ questions=[...byDiff].sort(()=>Math.random()-0.5).slice(0,10);
  index=0;score=0;
  document.getElementById("home").classList.add("hidden");
  document.getElementById("quiz").classList.remove("hidden");
  showQuestion();
 }
+
 function showQuestion(){
  locked=false;clearInterval(interval);timer=15;
  const q=questions[index];
@@ -148,14 +188,15 @@ function showQuestion(){
  document.getElementById("timer").textContent=timer;
  document.getElementById("score").textContent=score;
  document.getElementById("fill").style.width=((index)/10*100)+"%";
- document.getElementById("catTag").textContent=q[0];
- document.getElementById("question").textContent=q[1];
+ document.getElementById("catTag").textContent=q[0]+" · "+q[1];
+ document.getElementById("question").textContent=q[2];
  document.getElementById("feedback").innerHTML="";
- const answers=q.slice(2).map((a,i)=>({a,correct:i===0})).sort(()=>Math.random()-0.5);
+ const answers=q.slice(3).map((a,i)=>({a,correct:i===0})).sort(()=>Math.random()-0.5);
  const box=document.getElementById("answers");box.innerHTML="";
- answers.forEach(x=>{const b=document.createElement("button");b.type="button";b.className="answer";b.textContent=x.a;b.onclick=()=>answer(b,x.correct,q[2]);box.appendChild(b)});
- interval=setInterval(()=>{timer--;document.getElementById("timer").textContent=timer;if(timer<=0){clearInterval(interval);if(!locked)answer(null,false,q[2],true)}},1000);
+ answers.forEach(x=>{const b=document.createElement("button");b.type="button";b.className="answer";b.textContent=x.a;b.onclick=()=>answer(b,x.correct,q[3]);box.appendChild(b)});
+ interval=setInterval(()=>{timer--;document.getElementById("timer").textContent=timer;if(timer<=0){clearInterval(interval);if(!locked)answer(null,false,q[3],true)}},1000);
 }
+
 function answer(btn,correct,correctText,timeout=false){
  if(locked)return;locked=true;clearInterval(interval);
  [...document.querySelectorAll(".answer")].forEach(b=>{if(b.textContent===correctText)b.classList.add("correct")});
@@ -167,10 +208,11 @@ function answer(btn,correct,correctText,timeout=false){
  : `<div class="feedback">✕ ${timeout?"TEMPO SCADUTO":"RISPOSTA SBAGLIATA"}<small>Risposta corretta: ${correctText}</small></div>`;
  setTimeout(()=>{index++;if(index<10)showQuestion();else finish()},3000);
 }
+
 function finish(){
  document.getElementById("quiz").classList.add("hidden");document.getElementById("result").classList.remove("hidden");
  document.getElementById("finalScore").textContent=score+" ⭐";
- document.getElementById("finalText").innerHTML=`Hai completato 10 domande in <b>${selectedCat}</b>.<br>Modalità: ${selectedMode}<br>Nickname: <b>${document.getElementById("nick").value||"Giocatore"}</b>`;
+ document.getElementById("finalText").innerHTML=`Hai completato 10 domande in <b>${selectedCat}</b>.<br>Difficoltà: <b>${selectedDiff}</b><br>Modalità: ${selectedMode}<br>Nickname: <b>${document.getElementById("nick").value||"Giocatore"}</b>`;
 }
 </script>
 </body>
