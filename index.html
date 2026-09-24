@@ -35,6 +35,7 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
 .choiceTitle{font-size:13px;color:var(--muted);font-weight:800;margin:15px 0 8px}.versus{text-align:center;font-size:28px;font-weight:1000;color:var(--gold);margin:8px}
 .flash{animation:pop .35s ease}@keyframes pop{0%{transform:scale(.95);opacity:.5}100%{transform:scale(1);opacity:1}}
 .shake{animation:shake .3s}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.achievement{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #234533}.achievement:last-child{border-bottom:0}.achievement .ico{font-size:25px}.achievement small{display:block;color:var(--muted);margin-top:3px}.done{opacity:1}.locked{opacity:.42}.daily{background:linear-gradient(135deg,#173b25,#10291a);border:1px solid #3f7652;border-radius:15px;padding:14px}.daily b{color:var(--gold)}
 @media(max-width:390px){.grid{grid-template-columns:1fr}.question{font-size:20px}.nav button{font-size:11px}}
 </style>
 </head>
@@ -140,6 +141,15 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
         <div class="stat"><b id="statWins">0</b><span>Vittorie 1v1</span></div>
       </div>
     </div>
+    <div class="card">
+      <h2>🔥 Sfida del giorno</h2>
+      <div id="dailyChallenge"></div>
+      <button class="restart" id="dailyBtn">🎯 GIOCA LA SFIDA DI OGGI</button>
+    </div>
+    <div class="card">
+      <h2>🏅 Traguardi</h2>
+      <div id="achievements"></div>
+    </div>
   </section>
 </div>
 
@@ -150,6 +160,7 @@ const modes = ["🎮 Solo","⚔️ 1 vs 1"];
 let selectedCat="🌍 Misto", selectedDiff="🟢 Facile", selectedMode="🎮 Solo";
 let questions=[], index=0, score=0, timer=15, locked=false, interval;
 let duelQuestions=[], duelIndex=0, duelTurn=0, duelScores=[0,0], duelLocked=false;
+let dailyMode=false;
 
 const bank = [
 
@@ -216,13 +227,36 @@ const bank = [
 ["Record e statistiche","Esperto","Chi detiene il record di presenze ai Mondiali?","Lionel Messi","Lothar Matthäus","Miroslav Klose","Cafu"]
 ];
 
-const defaultProfile={name:"",xp:0,coins:0,games:0,best:0,correct:0,streak:0,wins:0};
-let profile=JSON.parse(localStorage.getItem("calcioQuizProfile")||"null")||defaultProfile;
+const defaultProfile={name:"",xp:0,coins:0,games:0,best:0,correct:0,streak:0,wins:0,totalAnswers:0,dailyDone:""};
+let profile=JSON.parse(localStorage.getItem("calcioQuizProfile")||"null")||{...defaultProfile};
+profile={...defaultProfile,...profile};
 let leaderboard=JSON.parse(localStorage.getItem("calcioQuizLeaderboard")||"[]");
 
 function save(){localStorage.setItem("calcioQuizProfile",JSON.stringify(profile));localStorage.setItem("calcioQuizLeaderboard",JSON.stringify(leaderboard));}
 function level(){return Math.floor(profile.xp/500)+1}
 function levelProgress(){return profile.xp%500}
+function todayKey(){return new Date().toISOString().slice(0,10)}
+function dailyQuestion(){
+  const d=new Date(); const seed=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  return bank[seed%bank.length];
+}
+function updateDaily(){
+  const q=dailyQuestion(), done=profile.dailyDone===todayKey();
+  document.getElementById("dailyChallenge").innerHTML=`<div class="daily"><b>${done?"✅ Sfida completata!":"🎯 1 domanda speciale"}</b><br><span>${q[2]}</span><br><small>${done?"Torna domani per una nuova sfida.":"Ricompensa: 250 XP + 50 monete se rispondi correttamente."}</small></div>`;
+  document.getElementById("dailyBtn").disabled=done;
+  document.getElementById("dailyBtn").style.opacity=done?.55:1;
+}
+function achievements(){
+ const a=[
+  ["⚽","Prima partita","Completa una partita",profile.games>=1],
+  ["🔥","In serie","Raggiungi 5 di serie",profile.streak>=5],
+  ["💰","Collezionista","Raccogli 100 monete",profile.coins>=100],
+  ["⭐","500 XP","Raggiungi 500 XP",profile.xp>=500],
+  ["🏆","Campione","Vinci un 1 vs 1",profile.wins>=1],
+  ["🎯","Cecchino","Rispondi correttamente a 25 domande",profile.correct>=25]
+ ];
+ document.getElementById("achievements").innerHTML=a.map(x=>`<div class="achievement ${x[3]?"done":"locked"}"><span class="ico">${x[0]}</span><div><b>${x[1]}</b><small>${x[2]} ${x[3]?"✓":"🔒"}</small></div></div>`).join("");
+}
 function updateUI(){
   const n=profile.name||"Giocatore";
   document.getElementById("nick").value=profile.name||"";
@@ -239,6 +273,7 @@ function updateUI(){
   document.getElementById("statCorrect").textContent=profile.correct;
   document.getElementById("statStreak").textContent=profile.streak;
   document.getElementById("statWins").textContent=profile.wins;
+  updateDaily(); achievements();
 }
 function show(id){
   ["home","quiz","duel","result","ranking","profile"].forEach(x=>document.getElementById(x).classList.add("hidden"));
@@ -271,6 +306,27 @@ function startQuiz(){
  if(selectedMode==="⚔️ 1 vs 1"){startDuel();return}
  questions=shuffle(getPool()).slice(0,10);index=0;score=0;show("quiz");showQuestion();
 }
+function startDaily(){
+ if(profile.dailyDone===todayKey()){alert("Hai già completato la sfida di oggi. Torna domani! 🔥");return;}
+ profile.name=document.getElementById("nick").value.trim()||"Giocatore"; save();
+ dailyMode=true; questions=[dailyQuestion()]; index=0; score=0; show("quiz"); showDailyQuestion();
+}
+function showDailyQuestion(){
+ locked=false; clearInterval(interval); timer=20; const q=questions[0];
+ document.getElementById("counter").textContent="🔥 SFIDA"; document.getElementById("timer").textContent=timer; document.getElementById("score").textContent=0;
+ document.getElementById("fill").style.width="100%"; document.getElementById("catTag").textContent=q[0]+" · SFIDA DEL GIORNO"; document.getElementById("question").textContent=q[2]; document.getElementById("feedback").innerHTML="";
+ const ans=shuffle(q.slice(3).map((a,i)=>({a,correct:i===0}))),box=document.getElementById("answers"); box.innerHTML="";
+ ans.forEach(x=>{const b=document.createElement("button");b.className="answer";b.textContent=x.a;b.onclick=()=>answerDaily(b,x.correct,q[3]);box.appendChild(b)});
+ interval=setInterval(()=>{timer--;document.getElementById("timer").textContent=timer;if(timer<=0){clearInterval(interval);if(!locked)answerDaily(null,false,q[3],true)}},1000);
+}
+function answerDaily(btn,correct,correctText,timeout=false){
+ if(locked)return; locked=true; clearInterval(interval); sound(correct);
+ [...document.querySelectorAll("#answers .answer")].forEach(b=>{if(b.textContent===correctText)b.classList.add("correct")}); if(btn&&!correct)btn.classList.add("wrong");
+ if(correct){profile.xp+=250;profile.coins+=50;profile.correct++;profile.totalAnswers++;profile.streak++;score=250;} else {profile.totalAnswers++;profile.streak=0;}
+ profile.dailyDone=todayKey(); save();
+ document.getElementById("score").textContent=score; document.getElementById("feedback").innerHTML=correct?`<div class="feedback">🏆 SFIDA SUPERATA!<small>+250 XP · +50 monete</small></div>`:`<div class="feedback">✕ ${timeout?"TEMPO SCADUTO":"RISPOSTA SBAGLIATA"}<small>Risposta corretta: ${correctText}</small></div>`;
+ setTimeout(()=>{dailyMode=false;document.getElementById("finalScore").textContent=correct?"250 ⭐":"0 ⭐";document.getElementById("resultTitle").textContent=correct?"🔥 Sfida completata!":"🎯 Ci riprovi domani?";document.getElementById("finalText").innerHTML=`${profile.name||"Giocatore"}, sfida del giorno completata.`;document.getElementById("earnedXp").textContent=correct?"+250":"+0";document.getElementById("earnedCoins").textContent=correct?"+50":"+0";document.getElementById("finalStreak").textContent=profile.streak;show("result")},1400);
+}
 function showQuestion(){
  locked=false;clearInterval(interval);timer=15;const q=questions[index];
  document.getElementById("counter").textContent=(index+1)+"/10";
@@ -285,12 +341,12 @@ function answer(btn,correct,correctText,timeout=false){
  if(locked)return;locked=true;clearInterval(interval);sound(correct);
  [...document.querySelectorAll("#answers .answer")].forEach(b=>{if(b.textContent===correctText)b.classList.add("correct")});
  if(btn&&!correct)btn.classList.add("wrong");
- const earned=correct?100+timer*5:0;score+=earned;document.getElementById("score").textContent=score;
+ const earned=correct?100+timer*5:0;score+=earned;profile.totalAnswers++;if(correct)profile.correct++;
  document.getElementById("feedback").innerHTML=correct?`<div class="feedback">✓ RISPOSTA CORRETTA<small>+${earned} punti</small></div>`:`<div class="feedback">✕ ${timeout?"TEMPO SCADUTO":"RISPOSTA SBAGLIATA"}<small>Risposta corretta: ${correctText}</small></div>`;
  setTimeout(()=>{index++;if(index<10)showQuestion();else finishSolo()},1800);
 }
 function finishSolo(){
- profile.games++;profile.correct+=questions.reduce((n,q)=>n,0);profile.streak++;
+ profile.games++;if(score>0)profile.streak++;else profile.streak=0;
  const earnedXp=Math.max(20,Math.floor(score/5)),earnedCoins=Math.max(5,Math.floor(score/25));
  profile.xp+=earnedXp;profile.coins+=earnedCoins;if(score>profile.best)profile.best=score;
  leaderboard.push({name:profile.name||"Giocatore",score,date:new Date().toLocaleDateString("it-IT")});
@@ -337,6 +393,7 @@ function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":
 document.getElementById("nick").addEventListener("input",e=>{profile.name=e.target.value.slice(0,18);save();updateUI()});
 buildButtons("categories",categories,x=>selectedCat=x);buildButtons("difficulties",diffs,x=>selectedDiff=x);buildButtons("modes",modes,x=>selectedMode=x);
 document.getElementById("startBtn").onclick=startQuiz;
+document.getElementById("dailyBtn").onclick=startDaily;
 document.getElementById("homeNav").onclick=()=>show("home");document.getElementById("rankNav").onclick=()=>show("ranking");document.getElementById("statsNav").onclick=()=>show("profile");
 document.getElementById("againBtn").onclick=()=>show("home");
 document.getElementById("shareBtn").onclick=async()=>{const text=`⚽ Calcio Quiz\\nHo fatto ${document.getElementById("finalScore").textContent}! 🏆`;try{if(navigator.share)await navigator.share({title:"Calcio Quiz",text});else{await navigator.clipboard.writeText(text);alert("Risultato copiato!");}}catch(e){}};
