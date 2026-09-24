@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚽ Calcio Quiz</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(145deg,#071b12,#0b2b1b);color:#fff;min-height:100vh}
+.app{max-width:520px;margin:auto;padding:22px 16px 40px}.logo{text-align:center;font-size:26px;font-weight:900;letter-spacing:1px;margin:10px 0 5px}.sub{text-align:center;color:#a9cbb8;margin-bottom:24px}
+.card{background:#10291d;border:1px solid #27533a;border-radius:22px;padding:20px;box-shadow:0 12px 35px #0006;margin-bottom:15px}
+label{display:block;font-size:13px;color:#9ec1ad;margin-bottom:8px;font-weight:700;text-transform:uppercase}
+input{width:100%;padding:15px;border-radius:13px;border:1px solid #416d54;background:#091b12;color:white;font-size:16px;outline:none}
+h2{font-size:19px;margin:4px 0 15px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{border:0;color:white;background:#183b28;border:1px solid #386449;border-radius:14px;padding:14px 10px;font-size:14px;font-weight:800;cursor:pointer;transition:.15s}
+button:hover{transform:translateY(-1px);background:#215337}.selected{background:#08783e!important;border-color:#55d48d!important;box-shadow:0 0 0 2px #55d48d44}
+.start{width:100%;margin-top:16px;background:#0aa957;font-size:17px;padding:16px}.start:hover{background:#0bc46a}
+.tag{display:inline-block;background:#183d29;border-radius:999px;padding:6px 10px;font-size:12px;color:#bce9cd}
+.hidden{display:none}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.timer{font-size:20px;font-weight:900;color:#ffd45c}.score{font-weight:800}.bar{height:7px;background:#173a28;border-radius:99px;overflow:hidden;margin:12px 0 22px}.fill{height:100%;background:#10b966;width:0%;transition:.25s}
+.question{font-size:22px;line-height:1.25;font-weight:900;margin:18px 0}.answers{display:grid;gap:10px}.answer{text-align:left;font-size:15px;padding:16px}.correct{background:#137a42!important;border-color:#5be39b!important}.wrong{background:#9e2730!important;border-color:#ff7a82!important}.feedback{margin-top:14px;padding:15px;border-radius:14px;background:#0a1d13;text-align:center;font-weight:800}.feedback small{display:block;color:#b8d2c2;margin-top:6px;font-weight:600}.result{text-align:center}.big{font-size:46px;font-weight:900;color:#62e69c;margin:8px}.restart{margin-top:15px;width:100%}
+@media(max-width:390px){.grid{grid-template-columns:1fr}.question{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="logo">⚽ CALCIO QUIZ</div>
+  <div class="sub">Quanto ne sai davvero?</div>
+
+  <section id="home">
+    <div class="card">
+      <label>Nickname</label>
+      <input id="nick" maxlength="18" placeholder="Inserisci il tuo nome">
+    </div>
+
+    <div class="card">
+      <h2>🎯 Scegli categoria</h2>
+      <div class="grid" id="categories"></div>
+    </div>
+
+    <div class="card">
+      <h2>🔥 Difficoltà</h2>
+      <div class="grid" id="difficulties"></div>
+      <h2 style="margin-top:20px">⚔️ Modalità</h2>
+      <div class="grid" id="modes"></div>
+      <button type="button" class="start" id="startBtn">INIZIA IL QUIZ</button>
+    </div>
+  </section>
+
+  <section id="quiz" class="hidden">
+    <div class="card">
+      <div class="top"><span id="counter">1/10</span><span class="timer" id="timer">15</span><span class="score">⭐ <span id="score">0</span></span></div>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <span class="tag" id="catTag"></span>
+      <div class="question" id="question"></div>
+      <div class="answers" id="answers"></div>
+      <div id="feedback"></div>
+    </div>
+  </section>
+
+  <section id="result" class="hidden">
+    <div class="card result">
+      <h2>🏁 Quiz completato!</h2>
+      <div class="big" id="finalScore">0</div>
+      <div id="finalText"></div>
+      <button class="restart" onclick="location.reload()">🔄 TORNA AL MENU</button>
+    </div>
+  </section>
+</div>
+
+<script>
+const categories = ["🌍 Misto","🇮🇹 Serie A","🇪🇺 Champions League","🌎 Mondiali","🏆 Europei","🇬🇧 Premier League","🇪🇸 La Liga","🇩🇪 Bundesliga","🇫🇷 Ligue 1","👤 Giocatori","🏟️ Squadre","📜 Storia del calcio","🥇 Record e statistiche"];
+const diffs = ["🟢 Facile","🟡 Media","🔴 Difficile","⚫ Esperto"];
+const modes = ["🎮 Solo","⚔️ 1 vs 1"];
+
+let selectedCat="🌍 Misto", selectedDiff="🟢 Facile", selectedMode="🎮 Solo";
+let questions=[], index=0, score=0, timer=15, locked=false, interval;
+
+const bank = [
+["Serie A","Quale squadra gioca le proprie partite interne a San Siro insieme al Milan?","Inter","Juventus","Roma","Napoli"],
+["Serie A","Quanti punti vale normalmente una vittoria in Serie A?","3","2","1","4"],
+["Champions League","Quale squadra ha vinto la Champions League 2009-10?","Inter","Barcelona","Bayern Monaco","Manchester United"],
+["Champions League","Chi è il miglior marcatore storico della Champions League?","Cristiano Ronaldo","Lionel Messi","Robert Lewandowski","Raúl"],
+["Mondiali","Quale nazionale ha vinto il Mondiale 2022?","Argentina","Francia","Brasile","Germania"],
+["Mondiali","Chi segnò il gol decisivo nella finale del Mondiale 2010?","Andrés Iniesta","David Villa","Xavi","Fernando Torres"],
+["Europei","Quale nazionale vinse Euro 2020, torneo disputato nel 2021?","Italia","Inghilterra","Francia","Spagna"],
+["Europei","Quale nazionale vinse Euro 1992?","Danimarca","Germania","Olanda","Svezia"],
+["Premier League","Quale stadio è la casa del Manchester United?","Old Trafford","Anfield","Emirates Stadium","Stamford Bridge"],
+["La Liga","In quale città si trova il Camp Nou?","Barcellona","Madrid","Valencia","Siviglia"],
+["Bundesliga","Quale club tedesco è noto come Die Roten?","Bayern Monaco","Borussia Dortmund","Schalke 04","Werder Brema"],
+["Ligue 1","Quale club francese gioca al Parc des Princes?","Paris Saint-Germain","Monaco","Lione","Marsiglia"],
+["Giocatori","Quale giocatore è soprannominato La Pulga?","Lionel Messi","Neymar","Kaká","Luis Suárez"],
+["Giocatori","Quale attaccante è noto come Il Fenomeno?","Ronaldo Nazário","Ronaldinho","Romário","Adriano"],
+["Squadre","Quale club è soprannominato I Reds?","Liverpool","Arsenal","Chelsea","Tottenham"],
+["Squadre","Quale club è soprannominato I Blaugrana?","Barcelona","Real Madrid","Atlético Madrid","Valencia"],
+["Storia del calcio","Chi allenò il Porto alla vittoria della Champions League 2003-04?","José Mourinho","Pep Guardiola","Carlo Ancelotti","Fabio Capello"],
+["Storia del calcio","Quale club vinse la prima Coppa dei Campioni nel 1956?","Real Madrid","Milan","Benfica","Inter"],
+["Record e statistiche","Quali due giocatori condivisero il titolo di capocannoniere del Mondiale 1994?","Stoichkov e Salenko","Romário e Baggio","Bebeto e Klinsmann","Batistuta e Baggio"],
+["Record e statistiche","Quale giocatore ha vinto il Pallone d'Oro nel 1991?","Jean-Pierre Papin","Lothar Matthäus","Marco van Basten","Roberto Baggio"],
+["Serie A","Quale club vinse la Coppa UEFA 1990-91?","Inter","Roma","Juventus","Napoli"],
+["Mondiali","Quale nazionale vinse il Mondiale 2006?","Italia","Francia","Germania","Brasile"],
+["Champions League","Chi segnò la doppietta dell'Inter nella finale di Champions League 2010?","Diego Milito","Samuel Eto'o","Wesley Sneijder","Maicon"],
+["Storia del calcio","Quale club italiano vinse la Coppa dei Campioni 1984-85?","Juventus","Milan","Inter","Roma"]
+];
+
+
+function buildButtons(id, arr, setter){
+ const el=document.getElementById(id);
+ el.innerHTML="";
+ arr.forEach((x,i)=>{
+   const b=document.createElement("button");
+   b.type="button";
+   b.textContent=x;
+   b.addEventListener("click", function(e){
+     e.preventDefault();
+     setter(x);
+     Array.from(el.children).forEach(z=>z.classList.remove("selected"));
+     b.classList.add("selected");
+   });
+   el.appendChild(b);
+   if(i===0)b.classList.add("selected");
+ });
+}
+buildButtons("categories",categories,x=>selectedCat=x);
+buildButtons("difficulties",diffs,x=>selectedDiff=x);
+buildButtons("modes",modes,x=>selectedMode=x);
+document.getElementById("startBtn").addEventListener("click", function(e){ e.preventDefault(); startQuiz(); });
+
+function startQuiz(){
+ if(!questions) questions=[];
+ // La modalità 1 vs 1 è già selezionabile; il collegamento online verrà aggiunto dopo.
+ const cat=selectedCat.replace(/^\S+\s+/, "").trim();
+ let pool=cat==="Misto"?bank:bank.filter(q=>q[0]===cat);
+ // Se una categoria non ha ancora 10 domande, completa con domande miste.
+ if(pool.length<10){
+   const extra=bank.filter(q=>!pool.includes(q)).sort(()=>Math.random()-0.5);
+   pool=pool.concat(extra);
+ }
+ questions=[...pool].sort(()=>Math.random()-0.5).slice(0,10);
+ index=0;score=0;
+ document.getElementById("home").classList.add("hidden");
+ document.getElementById("quiz").classList.remove("hidden");
+ showQuestion();
+}
+function showQuestion(){
+ locked=false;clearInterval(interval);timer=15;
+ const q=questions[index];
+ if(!q){ finish(); return; }
+ document.getElementById("counter").textContent=(index+1)+"/10";
+ document.getElementById("timer").textContent=timer;
+ document.getElementById("score").textContent=score;
+ document.getElementById("fill").style.width=((index)/10*100)+"%";
+ document.getElementById("catTag").textContent=q[0];
+ document.getElementById("question").textContent=q[1];
+ document.getElementById("feedback").innerHTML="";
+ const answers=q.slice(2).map((a,i)=>({a,correct:i===0})).sort(()=>Math.random()-0.5);
+ const box=document.getElementById("answers");box.innerHTML="";
+ answers.forEach(x=>{const b=document.createElement("button");b.type="button";b.className="answer";b.textContent=x.a;b.onclick=()=>answer(b,x.correct,q[2]);box.appendChild(b)});
+ interval=setInterval(()=>{timer--;document.getElementById("timer").textContent=timer;if(timer<=0){clearInterval(interval);if(!locked)answer(null,false,q[2],true)}},1000);
+}
+function answer(btn,correct,correctText,timeout=false){
+ if(locked)return;locked=true;clearInterval(interval);
+ [...document.querySelectorAll(".answer")].forEach(b=>{if(b.textContent===correctText)b.classList.add("correct")});
+ if(btn&&!correct)btn.classList.add("wrong");
+ let earned=correct?100+(timer*5):0;score+=earned;
+ document.getElementById("score").textContent=score;
+ document.getElementById("feedback").innerHTML=correct
+ ? `<div class="feedback">✓ RISPOSTA CORRETTA<small>Risposta: ${correctText}<br>+${earned} punti</small></div>`
+ : `<div class="feedback">✕ ${timeout?"TEMPO SCADUTO":"RISPOSTA SBAGLIATA"}<small>Risposta corretta: ${correctText}</small></div>`;
+ setTimeout(()=>{index++;if(index<10)showQuestion();else finish()},3000);
+}
+function finish(){
+ document.getElementById("quiz").classList.add("hidden");document.getElementById("result").classList.remove("hidden");
+ document.getElementById("finalScore").textContent=score+" ⭐";
+ document.getElementById("finalText").innerHTML=`Hai completato 10 domande in <b>${selectedCat}</b>.<br>Modalità: ${selectedMode}<br>Nickname: <b>${document.getElementById("nick").value||"Giocatore"}</b>`;
+}
+</script>
+</body>
+</html>
