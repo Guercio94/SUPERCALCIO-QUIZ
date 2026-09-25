@@ -68,7 +68,7 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
         <div><label>Username</label><input id="loginUsername" maxlength="18" autocomplete="username" placeholder="Il tuo username"></div>
         <div><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="La tua password"></div>
         <div class="authBtns"><button type="button" id="loginBtn">🔐 ACCEDI</button></div>
-        <div class="authHint">Non devi inserire nuovamente l'email su questo dispositivo: viene ricordata automaticamente dopo la registrazione.</div>
+        <div class="authHint">Per accedere bastano <b>username + password</b>. L'email viene recuperata automaticamente dall'account.</div>
       </div>
     </div>
     <button type="button" class="restart hidden" id="logoutBtn">🚪 ESCI DALL'ACCOUNT</button>
@@ -393,11 +393,22 @@ async function registerAccount(){
 async function loginAccount(){
   const username=document.getElementById("loginUsername").value.trim().slice(0,18);
   const password=document.getElementById("loginPassword").value;
-  const email=localStorage.getItem("calcioQuizAuthEmail");
   if(!username||!password){alert("Inserisci username e password.");return;}
-  if(!email){alert("Su questo dispositivo non è ancora stata salvata l'email dell'account. Registrati nuovamente oppure accedi una prima volta con l'email per salvarla.");return;}
+
+  // Trova l'email associata allo username direttamente nel database.
+  // In questo modo l'utente non deve mai reinserire l'email per accedere.
+  const {data:email,error:lookupError}=await supabaseClient.rpc("get_login_email",{p_username:username});
+  if(lookupError){
+    alert("Impossibile trovare l'account. Controlla che la funzione Supabase get_login_email sia stata creata.");
+    return;
+  }
+  if(!email){
+    alert("Username non trovato. Controlla lo username e riprova.");
+    return;
+  }
+
   const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
-  if(error){alert("Accesso non riuscito: "+error.message);return;}
+  if(error){alert("Accesso non riuscito: username o password non corretti.");return;}
   localStorage.setItem("calcioQuizAuthEmail",data.user.email||email);
   localStorage.setItem("calcioQuizAuthUsername",username);
   await loadOnlineProfile(data.user);
