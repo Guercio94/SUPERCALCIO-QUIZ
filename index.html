@@ -36,7 +36,8 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
 .flash{animation:pop .35s ease}@keyframes pop{0%{transform:scale(.95);opacity:.5}100%{transform:scale(1);opacity:1}}
 .shake{animation:shake .3s}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 .achievement{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #234533}.achievement:last-child{border-bottom:0}.achievement .ico{font-size:25px}.achievement small{display:block;color:var(--muted);margin-top:3px}.done{opacity:1}.locked{opacity:.42}.daily{background:linear-gradient(135deg,#173b25,#10291a);border:1px solid #3f7652;border-radius:15px;padding:14px}.daily b{color:var(--gold)}
-.authGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.authStatus{padding:11px 13px;border-radius:12px;background:#07170e;border:1px solid #315d43;color:#bfe5cd;font-size:13px;line-height:1.4}.authBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.authBtns button{padding:11px 8px}.authBtns .danger{background:#3b1820;border-color:#70343f}.onlineDot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#57e59a;margin-right:6px}.offlineDot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#888;margin-right:6px}.globalRank{margin-top:10px}
+.authGrid{display:grid;grid-template-columns:1fr;gap:9px}.authStatus{padding:11px 13px;border-radius:12px;background:#07170e;border:1px solid #315d43;color:#bfe5cd;font-size:13px;line-height:1.4}.authSwitch{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.authSwitch button{padding:11px 8px}.authSwitch .active{background:#08783e;border-color:#55d48d;box-shadow:0 0 0 2px #55d48d44}.authBtns{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.authBtns button{padding:12px 8px}.authBtns .danger{background:#3b1820;border-color:#70343f}.authHint{margin-top:8px;padding:10px 12px;border-radius:12px;background:#0a1d13;border:1px solid #234a33;color:#9ec1ad;font-size:12px;line-height:1.45}.onlineDot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#57e59a;margin-right:6px}.offlineDot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#888;margin-right:6px}.globalRank{margin-top:10px}
+
 .onlineDuelGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.onlineDuelGrid button{width:100%}.duelCode{font-size:32px;letter-spacing:7px;font-weight:1000;text-align:center;color:var(--gold);padding:14px;border:1px dashed #5c8d6c;border-radius:15px;background:#07170e;margin:12px 0}.onlineWaiting{text-align:center;padding:14px;border-radius:14px;background:#07170e;border:1px solid #315d43;color:#bfe5cd}.onlineDuelScore{display:grid;grid-template-columns:1fr 1fr;gap:9px}.onlineDuelScore .stat{padding:14px}.onlineAnswerState{margin-top:10px}.onlineQuestionMeta{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:12px;margin-bottom:8px}
 @media(max-width:390px){.grid{grid-template-columns:1fr}.question{font-size:20px}.nav button{font-size:11px}}
 </style>
@@ -50,15 +51,24 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
     <h2>🌐 Account online</h2>
     <div class="mini" id="authStatus"><span class="offlineDot"></span>Non hai ancora effettuato l'accesso.</div>
     <div id="authForm" style="margin-top:12px">
-      <label>Username</label>
-      <input id="authUsername" maxlength="18" placeholder="Il tuo nome nel gioco">
-      <div class="authGrid" style="margin-top:9px">
-        <div><label>Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="tua@email.it"></div>
-        <div><label>Password</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Almeno 6 caratteri"></div>
+      <div class="authSwitch">
+        <button type="button" id="showRegisterBtn" class="active">📝 REGISTRATI</button>
+        <button type="button" id="showLoginBtn">🔐 ACCEDI</button>
       </div>
-      <div class="authBtns">
-        <button type="button" id="registerBtn">📝 REGISTRATI</button>
-        <button type="button" id="loginBtn">🔐 ACCEDI</button>
+
+      <div id="registerForm" class="authGrid" style="margin-top:12px">
+        <div><label>Username</label><input id="authUsername" maxlength="18" autocomplete="username" placeholder="Il tuo nome nel gioco"></div>
+        <div><label>Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="tua@email.it"></div>
+        <div><label>Password</label><input id="authPassword" type="password" autocomplete="new-password" placeholder="Almeno 6 caratteri"></div>
+        <div class="authBtns"><button type="button" id="registerBtn">📝 CREA ACCOUNT</button></div>
+        <div class="authHint">L'email serve solo per creare e confermare l'account. Dopo la registrazione, per entrare userai <b>username + password</b>.</div>
+      </div>
+
+      <div id="loginForm" class="authGrid hidden" style="margin-top:12px">
+        <div><label>Username</label><input id="loginUsername" maxlength="18" autocomplete="username" placeholder="Il tuo username"></div>
+        <div><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="La tua password"></div>
+        <div class="authBtns"><button type="button" id="loginBtn">🔐 ACCEDI</button></div>
+        <div class="authHint">Non devi inserire nuovamente l'email su questo dispositivo: viene ricordata automaticamente dopo la registrazione.</div>
       </div>
     </div>
     <button type="button" class="restart hidden" id="logoutBtn">🚪 ESCI DALL'ACCOUNT</button>
@@ -125,8 +135,9 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
 
   <section id="quiz" class="hidden">
     <div class="card">
-      <div class="top"><span class="tag" id="quizCat">Misto</span><span class="timer" id="timer">15</span><span class="score" id="score">0</span></div>
-      <div class="bar"><div class="fill" id="progress"></div></div>
+      <div class="top"><span id="counter">1/10</span><span class="timer" id="timer">15</span><span class="score">⭐ <span id="score">0</span></span></div>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <span class="tag" id="catTag"></span>
       <div class="question" id="question"></div>
       <div class="answers" id="answers"></div>
       <div id="feedback"></div>
@@ -135,8 +146,12 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
 
   <section id="duel" class="hidden">
     <div class="card">
-      <div class="top"><span class="tag">⚔️ 1 VS 1</span><span class="score"><span id="p1Name">P1</span> <b id="p1Score">0</b> - <b id="p2Score">0</b> <span id="p2Name">P2</span></span></div>
-      <div class="onlineQuestionMeta"><span id="duelQ">1/5</span><span id="duelTurn">Turno</span></div>
+      <div class="versus">⚔️ 1 VS 1</div>
+      <div class="stats">
+        <div class="stat"><b id="p1Score">0</b><span id="p1Name">Giocatore 1</span></div>
+        <div class="stat"><b id="duelQ">1/5</b><span>Domanda</span></div>
+        <div class="stat"><b id="p2Score">0</b><span id="p2Name">Giocatore 2</span></div>
+      </div>
       <div class="question" id="duelQuestion"></div>
       <div class="answers" id="duelAnswers"></div>
       <div id="duelFeedback"></div>
@@ -145,295 +160,424 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
 
   <section id="result" class="hidden">
     <div class="card result">
-      <h2 id="resultTitle">🎉 Risultato</h2>
-      <div class="big" id="finalScore">0</div>
+      <h2 id="resultTitle">🏁 Quiz completato!</h2>
+      <div class="big" id="finalScore">0 ⭐</div>
       <div id="finalText"></div>
-      <div class="stats" style="margin-top:14px">
-        <div class="stat"><b id="earnedXp">+0</b><span>XP</span></div>
-        <div class="stat"><b id="earnedCoins">+0</b><span>Monete</span></div>
+      <div class="stats" style="margin-top:15px">
+        <div class="stat"><b id="earnedXp">0</b><span>XP</span></div>
+        <div class="stat"><b id="earnedCoins">0</b><span>Monete</span></div>
         <div class="stat"><b id="finalStreak">0</b><span>Serie</span></div>
       </div>
-      <button type="button" class="restart" id="againBtn">🔄 GIOCA ANCORA</button>
-      <button type="button" class="restart" id="shareBtn">📤 CONDIVIDI</button>
-    </div>
-  </section>
-
-  <section id="daily" class="hidden">
-    <div class="card">
-      <h2>🔥 Sfida del giorno</h2>
-      <div class="daily"><b>Una sfida al giorno</b><br><span class="mini">Completa le 5 domande giornaliere.</span></div>
-      <button type="button" class="start" id="dailyBtn">INIZIA SFIDA</button>
+      <button class="restart" id="shareBtn">📤 CONDIVIDI RISULTATO</button>
+      <button class="restart" id="againBtn">🔄 GIOCA ANCORA</button>
     </div>
   </section>
 
   <section id="ranking" class="hidden">
     <div class="card">
       <h2>🌐 Classifica globale XP</h2>
-      <div class="mini">I giocatori con account online condividono questa classifica.</div>
-      <div id="globalLeaderboard" class="globalRank"></div>
+      <div class="mini" style="margin-bottom:12px">I giocatori con account online condividono questa classifica.</div>
+      <div id="globalLeaderboard"><div class="mini">Caricamento classifica globale...</div></div>
     </div>
     <div class="card">
       <h2>📱 Classifica locale</h2>
-      <div class="mini">I punteggi delle partite restano anche su questo dispositivo.</div>
+      <div class="mini" style="margin-bottom:12px">I punteggi delle partite restano anche su questo dispositivo.</div>
       <div id="leaderboard"></div>
-      <button type="button" class="restart" id="clearRankBtn">🗑️ Azzera classifica locale</button>
+      <button class="restart" id="clearRankBtn">🗑️ Azzera classifica locale</button>
     </div>
   </section>
 
   <section id="profile" class="hidden">
     <div class="card">
       <h2>📊 Il tuo profilo</h2>
-      <div class="stats">
-        <div class="stat"><b id="profXp">0</b><span>XP</span></div>
-        <div class="stat"><b id="profLevel">1</b><span>Livello</span></div>
-        <div class="stat"><b id="profCoins">100</b><span>Monete</span></div>
-        <div class="stat"><b id="profWins">0</b><span>Vittorie</span></div>
-        <div class="stat"><b id="profGames">0</b><span>Partite</span></div>
-        <div class="stat"><b id="profCorrect">0</b><span>Corrette</span></div>
+      <div class="rank"><span id="profileName">Giocatore</span><span class="level" id="profileLevel">Livello 1</span></div>
+      <div class="xpbar"><div class="xpfill" id="profileXp"></div></div>
+      <div class="mini" id="profileXpText"></div>
+      <div class="stats" style="margin-top:15px">
+        <div class="stat"><b id="statGames">0</b><span>Partite</span></div>
+        <div class="stat"><b id="statBest">0</b><span>Record</span></div>
+        <div class="stat"><b id="statCoins">0</b><span>Monete</span></div>
       </div>
-      <div class="rank" style="margin-top:15px"><b>Progressione</b><span class="level" id="profLevelText">Livello 1</span></div>
-      <div class="xpbar"><div class="xpfill" id="profXpBar"></div></div>
-      <div class="mini" id="profXpText">0 / 500 XP</div>
+      <div class="stats" style="margin-top:8px">
+        <div class="stat"><b id="statCorrect">0</b><span>Corrette</span></div>
+        <div class="stat"><b id="statStreak">0</b><span>Serie attuale</span></div>
+        <div class="stat"><b id="statWins">0</b><span>Vittorie 1v1</span></div>
+      </div>
+      <div class="mini" style="margin-top:10px">Miglior serie: <b id="statBestStreak">0</b></div>
+    </div>
+    <div class="card">
+      <h2>🌐 Stato online</h2>
+      <div class="mini" id="profileOnlineStatus">Non connesso</div>
+    </div>
+    <div class="card">
+      <h2>🔥 Sfida del giorno</h2>
+      <div id="dailyChallenge"></div>
+      <button class="restart" id="dailyBtn">🎯 GIOCA LA SFIDA DI OGGI</button>
+    </div>
+    <div class="card">
+      <h2>🏅 Traguardi</h2>
+      <div id="achievements"></div>
     </div>
   </section>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL="https://cofwxxuipoztdvyhdll.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY="sb_publishable_nyZNfMlz3ahR_pgi6b5kLA_56TH_XPz";
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const SUPABASE_URL = "https://cofwxxuipoztdvyhdll.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_nyZNfMlz3ahR_pgi6b5kLA_56TH_XPz";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+let currentUser = null;
+let onlineProfile = null;
 
-const categories=["Misto","Serie A","Champions League","Mondiali","Europei","Premier League","La Liga","Bundesliga","Ligue 1","Giocatori","Squadre","Storia del calcio","Record e statistiche"];
-const diffs=["🟢 Facile","🟡 Media","🔴 Difficile","⚫ Esperto"];
-const modes=["🎮 Solo","⚔️ 1 vs 1","🌐 1 vs 1 Online"];
-const questions=[
-["Misto","facile","Chi ha vinto il Mondiale 2006?","Italia","Francia","Brasile","Germania"],
-["Misto","facile","Quanti giocatori ha una squadra in campo nel calcio?","11","10","12","9"],
-["Serie A","facile","Quale squadra ha vinto più Scudetti?","Juventus","Milan","Inter","Roma"],
-["Serie A","media","Chi è il miglior marcatore storico della Serie A?","Silvio Piola","Francesco Totti","Gunnar Nordahl","Roberto Baggio"],
-["Champions League","facile","Quale squadra ha vinto più Champions League?","Real Madrid","Milan","Liverpool","Bayern Monaco"],
-["Champions League","media","Chi ha segnato più gol nella storia della Champions League?","Cristiano Ronaldo","Messi","Lewandowski","Benzema"],
-["Mondiali","facile","Dove si è giocato il Mondiale 2014?","Brasile","Russia","Germania","Sudafrica"],
-["Mondiali","media","Quale nazionale ha vinto il Mondiale 2010?","Spagna","Olanda","Germania","Argentina"],
-["Europei","facile","Chi ha vinto Euro 2020?","Italia","Inghilterra","Francia","Portogallo"],
-["Premier League","facile","Quale squadra è famosa come Red Devils?","Manchester United","Liverpool","Arsenal","Chelsea"],
-["La Liga","facile","Quale squadra gioca al Camp Nou?","Barcellona","Real Madrid","Atletico Madrid","Valencia"],
-["Bundesliga","facile","Quale squadra è soprannominata Die Roten?","Bayern Monaco","Borussia Dortmund","Schalke","Leverkusen"],
-["Ligue 1","facile","Quale squadra gioca al Parc des Princes?","PSG","Marsiglia","Lione","Monaco"],
-["Giocatori","facile","Chi è soprannominato La Pulga?","Messi","Ronaldo","Neymar","Mbappe"],
-["Giocatori","media","Quale giocatore ha vinto più Palloni d'Oro?","Messi","Cristiano Ronaldo","Modric","Ronaldinho"],
-["Squadre","facile","Quale squadra ha colori rossoneri?","Milan","Inter","Juventus","Roma"],
-["Squadre","facile","Quale squadra è chiamata Nerazzurri?","Inter","Milan","Lazio","Atalanta"],
-["Storia del calcio","media","In quale anno è nato il calcio moderno con la Football Association?","1863","1871","1900","1850"],
-["Record e statistiche","media","Quanti Palloni d'Oro ha vinto Messi fino al 2023?","8","7","6","5"],
-["Record e statistiche","facile","Qual è il punteggio massimo di una risposta nella modalità standard?","125","100","150","200"],
-["Misto","media","Quale nazionale ha vinto più Mondiali?","Brasile","Germania","Italia","Argentina"],
-["Misto","media","Chi ha segnato il gol del 1-0 nella finale Mondiale 2010?","Andres Iniesta","David Villa","Xavi","Torres"],
-["Serie A","media","Quale squadra è detta La Dea?","Atalanta","Lazio","Fiorentina","Napoli"],
-["Serie A","facile","Quale squadra gioca allo Stadio Olimpico di Roma?","Roma e Lazio","Milan e Inter","Juventus e Torino","Napoli e Salernitana"],
-["Champions League","facile","In quale città si trova Anfield?","Liverpool","Manchester","Londra","Birmingham"],
-["Champions League","media","Quale squadra ha vinto la Champions 2023?","Manchester City","Inter","Real Madrid","Bayern"],
-["Mondiali","media","Chi è il miglior marcatore della storia dei Mondiali?","Miroslav Klose","Ronaldo","Messi","Gerd Muller"],
-["Europei","media","Quale nazionale ha vinto Euro 2016?","Portogallo","Francia","Germania","Spagna"],
-["Premier League","media","Chi ha vinto la Premier League 2015-16?","Leicester City","Chelsea","Manchester City","Arsenal"],
-["La Liga","media","Quale squadra è detta Los Blancos?","Real Madrid","Barcellona","Atletico Madrid","Sevilla"],
-["Bundesliga","media","Quale squadra ha vinto più Bundesliga?","Bayern Monaco","Dortmund","Werder Brema","Amburgo"],
-["Ligue 1","media","Quale squadra ha dominato molti titoli francesi dal 2010?","PSG","Lione","Marsiglia","Monaco"],
-["Giocatori","facile","In quale ruolo gioca normalmente un portiere?","Portiere","Difensore","Centrocampista","Attaccante"],
-["Giocatori","media","Quale giocatore è famoso per il soprannome CR7?","Cristiano Ronaldo","Ronaldo Nazario","Ronaldinho","Rivaldo"],
-["Squadre","media","Quale squadra è chiamata Vecchia Signora?","Juventus","Milan","Inter","Roma"],
-["Squadre","media","Quale squadra è chiamata Giallorossi?","Roma","Milan","Napoli","Lazio"],
-["Storia del calcio","facile","Quale paese ha ospitato il primo Mondiale nel 1930?","Uruguay","Italia","Brasile","Francia"],
-["Storia del calcio","media","Chi vinse il primo Mondiale della storia?","Uruguay","Argentina","Brasile","Italia"],
-["Record e statistiche","facile","Qual è la durata regolamentare di una partita?","90 minuti","80 minuti","100 minuti","120 minuti"],
-["Record e statistiche","media","Quanti minuti dura un tempo regolamentare?","45","40","50","30"],
-["Misto","facile","Quanti tempi ha una partita di calcio?","2","3","4","1"],
-["Misto","facile","Quale cartellino indica l'espulsione?","Rosso","Giallo","Blu","Verde"],
-["Misto","facile","Quale cartellino indica un'ammonizione?","Giallo","Rosso","Blu","Verde"],
-["Serie A","facile","Quale squadra è famosa per il Maradona di Napoli?","Napoli","Roma","Lazio","Fiorentina"],
-["Serie A","media","Quale squadra ha sede a Milano e colori nerazzurri?","Inter","Milan","Atalanta","Bologna"],
-["Champions League","facile","Quale competizione europea per club è indicata con UCL?","Champions League","Europa League","Conference League","Supercoppa"],
-["Mondiali","facile","Ogni quanti anni si disputa normalmente il Mondiale?","4","2","3","5"],
-["Europei","facile","Ogni quanti anni si disputano normalmente gli Europei?","4","2","3","5"],
-["Premier League","facile","Quale squadra gioca all'Emirates Stadium?","Arsenal","Chelsea","Tottenham","Liverpool"],
-["La Liga","facile","Quale squadra gioca al Santiago Bernabeu?","Real Madrid","Barcellona","Valencia","Sevilla"],
-["Bundesliga","facile","Quale squadra gioca al Signal Iduna Park?","Borussia Dortmund","Bayern Monaco","Leipzig","Leverkusen"],
-["Ligue 1","facile","Quale squadra è soprannominata Les Parisiens?","PSG","Lione","Marsiglia","Monaco"],
-["Giocatori","media","Quale giocatore argentino ha vinto il Mondiale 2022?","Lionel Messi","Angel Di Maria","Paulo Dybala","Lautaro Martinez"],
-["Squadre","facile","Quale squadra ha sede a Torino ed è bianconera?","Juventus","Torino","Milan","Inter"],
-["Storia del calcio","media","In quale continente è nata la Football Association inglese?","Europa","Sud America","Asia","Africa"],
-["Record e statistiche","facile","Quanti punti vale normalmente una vittoria in campionato?","3","2","1","4"],
-["Misto","media","Quale competizione si gioca tra nazionali europee?","Europei","Champions League","Europa League","Conference League"]
+const categories = ["🌍 Misto","🇮🇹 Serie A","🇪🇺 Champions League","🌎 Mondiali","🏆 Europei","🇬🇧 Premier League","🇪🇸 La Liga","🇩🇪 Bundesliga","🇫🇷 Ligue 1","👤 Giocatori","🏟️ Squadre","📜 Storia del calcio","🥇 Record e statistiche"];
+const diffs = ["🟢 Facile","🟡 Media","🔴 Difficile","⚫ Esperto"];
+const modes = ["🎮 Solo","⚔️ 1 vs 1","🌐 1 vs 1 Online"];
+let selectedCat="🌍 Misto", selectedDiff="🟢 Facile", selectedMode="🎮 Solo";
+let questions=[], index=0, score=0, timer=15, locked=false, interval;
+let duelQuestions=[], duelIndex=0, duelTurn=0, duelScores=[0,0], duelLocked=false;
+let dailyMode=false;
+let onlineDuel=null, onlinePoll=null, onlineAnswered=false, onlineLastQuestion=-1;
+
+
+const bank = [
+
+["Serie A","Facile","Quanti punti vale normalmente una vittoria in Serie A?","3","2","1","4"],
+["Serie A","Facile","Quale squadra gioca le proprie partite interne a San Siro insieme al Milan?","Inter","Juventus","Roma","Napoli"],
+["Serie A","Facile","Quale squadra è soprannominata La Vecchia Signora?","Juventus","Milan","Lazio","Torino"],
+["Serie A","Media","Quale club vinse la Coppa UEFA 1990-91?","Inter","Roma","Juventus","Napoli"],
+["Serie A","Media","Quale squadra ha come colori tradizionali il giallo e il rosso?","Roma","Lazio","Napoli","Atalanta"],
+["Serie A","Difficile","Quale allenatore guidò l'Inter al Triplete nel 2010?","José Mourinho","Roberto Mancini","Rafael Benítez","Marcello Lippi"],
+["Serie A","Difficile","Quale club vinse lo Scudetto 1984-85?","Verona","Juventus","Roma","Torino"],
+["Serie A","Esperto","Quale club vinse il primo campionato italiano di calcio nel 1898?","Genoa","Milan","Juventus","Pro Vercelli"],
+["Champions League","Facile","Quale squadra ha vinto la Champions League 2009-10?","Inter","Barcelona","Bayern Monaco","Manchester United"],
+["Champions League","Facile","Chi è il miglior marcatore storico della Champions League?","Cristiano Ronaldo","Lionel Messi","Robert Lewandowski","Raúl"],
+["Champions League","Media","Chi segnò la doppietta dell'Inter nella finale di Champions League 2010?","Diego Milito","Samuel Eto'o","Wesley Sneijder","Maicon"],
+["Champions League","Media","Quale club ha vinto la finale del 1999 segnando due gol nei minuti di recupero?","Manchester United","Bayern Monaco","Real Madrid","Juventus"],
+["Champions League","Difficile","Quale squadra vinse la Champions League nel 2004?","Porto","Monaco","Milan","Deportivo La Coruña"],
+["Champions League","Difficile","Chi segnò il gol del 2-1 nella finale 2005 tra Milan e Liverpool?","Vladimir Smicer","Hernán Crespo","Xabi Alonso","Andriy Shevchenko"],
+["Champions League","Esperto","Quale club ha vinto più Coppe dei Campioni/Champions League?","Real Madrid","Milan","Liverpool","Bayern Monaco"],
+["Mondiali","Facile","Quale nazionale ha vinto il Mondiale 2022?","Argentina","Francia","Brasile","Germania"],
+["Mondiali","Facile","Quale nazionale vinse il Mondiale 2006?","Italia","Francia","Germania","Brasile"],
+["Mondiali","Media","Chi segnò il gol decisivo nella finale del Mondiale 2010?","Andrés Iniesta","David Villa","Xavi","Fernando Torres"],
+["Mondiali","Media","In quale anno si disputò il primo Mondiale?","1930","1928","1934","1938"],
+["Mondiali","Difficile","Quale nazionale vinse il Mondiale 1978?","Argentina","Paesi Bassi","Brasile","Italia"],
+["Mondiali","Difficile","Chi segnò il gol della Mano de Dios nel 1986?","Diego Maradona","Jorge Valdano","Pelé","Gary Lineker"],
+["Mondiali","Esperto","Quale nazionale ha disputato più finali del Mondiale?","Germania","Brasile","Italia","Argentina"],
+["Europei","Facile","Quale nazionale vinse Euro 2020, torneo disputato nel 2021?","Italia","Inghilterra","Francia","Spagna"],
+["Europei","Facile","Quale nazionale vinse Euro 1992?","Danimarca","Germania","Olanda","Svezia"],
+["Europei","Media","Chi segnò il rigore decisivo per l'Italia nella finale di Euro 2020?","Mancini","Jorginho","Bonucci","Donnarumma"],
+["Europei","Media","Quale nazionale vinse Euro 2004?","Grecia","Portogallo","Spagna","Francia"],
+["Europei","Difficile","Chi segnò il gol dell'Italia nella finale di Euro 1968?","Luigi Riva","Pietro Anastasi","Gigi Meroni","Sandro Mazzola"],
+["Europei","Esperto","Quale nazionale ha vinto più volte gli Europei insieme alla Spagna?","Germania","Francia","Italia","Portogallo"],
+["Premier League","Facile","Quale stadio è la casa del Manchester United?","Old Trafford","Anfield","Emirates Stadium","Stamford Bridge"],
+["Premier League","Facile","Quale club è soprannominato The Reds?","Liverpool","Chelsea","Arsenal","Everton"],
+["Premier League","Media","Quale squadra ha vinto la Premier League 2015-16?","Leicester City","Chelsea","Arsenal","Manchester City"],
+["Premier League","Media","Chi è il miglior marcatore storico della Premier League?","Alan Shearer","Wayne Rooney","Harry Kane","Thierry Henry"],
+["Premier League","Difficile","Quale allenatore guidò il Leicester al titolo 2015-16?","Claudio Ranieri","José Mourinho","Arsène Wenger","Brendan Rodgers"],
+["La Liga","Facile","In quale città si trova il Camp Nou?","Barcellona","Madrid","Valencia","Siviglia"],
+["La Liga","Facile","Quale club è soprannominato Los Blancos?","Real Madrid","Barcelona","Valencia","Sevilla"],
+["La Liga","Media","Quale squadra vinse La Liga 2020-21?","Atlético Madrid","Real Madrid","Barcelona","Sevilla"],
+["La Liga","Difficile","Chi è il miglior marcatore storico della Liga?","Lionel Messi","Cristiano Ronaldo","Karim Benzema","Telmo Zarra"],
+["Bundesliga","Facile","Quale club tedesco è noto come Die Roten?","Bayern Monaco","Borussia Dortmund","Schalke 04","Werder Brema"],
+["Bundesliga","Facile","Quale club gioca al Signal Iduna Park?","Borussia Dortmund","Bayern Monaco","Bayer Leverkusen","RB Lipsia"],
+["Bundesliga","Media","Quale squadra vinse la Bundesliga 2023-24 interrompendo il dominio del Bayern?","Bayer Leverkusen","Borussia Dortmund","Stoccarda","RB Lipsia"],
+["Ligue 1","Facile","Quale club francese gioca al Parc des Princes?","Paris Saint-Germain","Monaco","Lione","Marsiglia"],
+["Ligue 1","Media","Quale club ha sede nel Principato di Monaco?","Monaco","Lione","Nizza","Nantes"],
+["Giocatori","Facile","Quale giocatore è soprannominato La Pulga?","Lionel Messi","Neymar","Kaká","Luis Suárez"],
+["Giocatori","Facile","Quale attaccante è noto come Il Fenomeno?","Ronaldo Nazário","Ronaldinho","Romário","Adriano"],
+["Giocatori","Media","Quale portiere italiano è soprannominato Superman?","Gianluigi Buffon","Dino Zoff","Walter Zenga","Francesco Toldo"],
+["Giocatori","Media","Quale giocatore è noto come King Eric?","Eric Cantona","Eric Abidal","Eric Bailly","David Beckham"],
+["Giocatori","Difficile","Quale giocatore vinse il Pallone d'Oro 1991?","Jean-Pierre Papin","Lothar Matthäus","Marco van Basten","Roberto Baggio"],
+["Giocatori","Esperto","Quale giocatore ha vinto il Pallone d'Oro nel 1960?","Luis Suárez Miramontes","Alfredo Di Stéfano","Ferenc Puskás","Raymond Kopa"],
+["Squadre","Facile","Quale club è soprannominato I Reds?","Liverpool","Arsenal","Chelsea","Tottenham"],
+["Squadre","Facile","Quale club è soprannominato I Blaugrana?","Barcelona","Real Madrid","Atlético Madrid","Valencia"],
+["Squadre","Media","Quale club italiano è soprannominato I Giallorossi?","Roma","Lecce","Palermo","Bologna"],
+["Squadre","Difficile","Quale club portoghese è soprannominato Dragões?","Porto","Benfica","Sporting CP","Braga"],
+["Storia del calcio","Facile","Chi allenò il Porto alla vittoria della Champions League 2003-04?","José Mourinho","Pep Guardiola","Carlo Ancelotti","Fabio Capello"],
+["Storia del calcio","Facile","Quale club vinse la prima Coppa dei Campioni nel 1956?","Real Madrid","Milan","Benfica","Inter"],
+["Storia del calcio","Media","Quale club italiano vinse la Coppa dei Campioni 1984-85?","Juventus","Milan","Inter","Roma"],
+["Storia del calcio","Difficile","Quale nazione vinse il primo Europeo per nazionali nel 1960?","Unione Sovietica","Jugoslavia","Spagna","Francia"],
+["Storia del calcio","Esperto","In quale anno fu fondata la FIFA?","1904","1896","1910","1920"],
+["Record e statistiche","Media","Quali due giocatori condivisero il titolo di capocannoniere del Mondiale 1994?","Stoichkov e Salenko","Romário e Baggio","Bebeto e Klinsmann","Batistuta e Baggio"],
+["Record e statistiche","Difficile","Quale giocatore ha segnato più gol in una singola edizione del Mondiale?","Just Fontaine","Ronaldo","Gerd Müller","Miroslav Klose"],
+["Record e statistiche","Difficile","Quale nazionale ha segnato più gol nella storia dei Mondiali fino al 2022?","Brasile","Germania","Argentina","Italia"],
+["Record e statistiche","Esperto","Chi detiene il record di presenze ai Mondiali?","Lionel Messi","Lothar Matthäus","Miroslav Klose","Cafu"]
 ];
-let profile=JSON.parse(localStorage.getItem("calcioQuizProfile")||"null")||{name:"",xp:0,level:1,coins:100,wins:0,games:0,correct:0,totalAnswers:0,streak:0,bestStreak:0,best:0};
+
+const defaultProfile={name:"",xp:0,coins:0,games:0,best:0,correct:0,streak:0,bestStreak:0,wins:0,totalAnswers:0,dailyDone:""};
+let profile=JSON.parse(localStorage.getItem("calcioQuizProfile")||"null")||{...defaultProfile};
+profile={...defaultProfile,...profile};
 let leaderboard=JSON.parse(localStorage.getItem("calcioQuizLeaderboard")||"[]");
-let selectedCat="Misto",selectedDiff="🟢 Facile",selectedMode="🎮 Solo";
-let quizQuestions=[],quizIndex=0,score=0,timer=null,timeLeft=15,duelQuestions=[],duelIndex=0,duelTurn=0,duelScores=[0,0],duelLocked=false;
-let currentUser=null,onlineProfile=null,onlineDuel=null,onlinePoll=null,onlineAnswered=false,onlineLastQuestion=-1;
-const levelXp=l=>500*(l-1);
-function save(){localStorage.setItem("calcioQuizProfile",JSON.stringify(profile));localStorage.setItem("calcioQuizLeaderboard",JSON.stringify(leaderboard));updateUI()}
+
+async function syncOnlineProfile(){
+  if(!currentUser)return;
+  const username=(profile.name||currentUser.email?.split("@")[0]||"Giocatore").slice(0,18);
+  const payload={
+    username,
+    xp:profile.xp||0,
+    level:level(),
+    coins:profile.coins||0,
+    wins:profile.wins||0,
+    games:profile.games||0,
+    correct_answers:profile.correct||0,
+    streak:profile.streak||0,
+    best_streak:profile.bestStreak||profile.streak||0
+  };
+  const {error}=await supabaseClient.from("profiles").update(payload).eq("id",currentUser.id);
+  if(error)console.warn("Sync profilo online:",error.message);
+}
+async function loadOnlineProfile(user){
+  currentUser=user;
+  const {data,error}=await supabaseClient.from("profiles").select("*").eq("id",user.id).maybeSingle();
+  if(error){console.warn("Caricamento profilo:",error.message);return;}
+  if(data){
+    onlineProfile=data;
+    profile.name=data.username||profile.name||user.email?.split("@")[0]||"Giocatore";
+    profile.xp=Number(data.xp)||0;
+    profile.coins=Number(data.coins)||0;
+    profile.games=Number(data.games)||0;
+    profile.correct=Number(data.correct_answers)||0;
+    profile.streak=Number(data.streak)||0;
+    profile.bestStreak=Number(data.best_streak)||profile.streak||0;
+    profile.wins=Number(data.wins)||0;
+    save();
+  }else{
+    await supabaseClient.from("profiles").upsert({id:user.id,username:profile.name||user.email?.split("@")[0]||"Giocatore"});
+    await syncOnlineProfile();
+  }
+  updateUI();
+  updateAuthUI();
+}
+function updateAuthUI(){
+  const status=document.getElementById("authStatus"),form=document.getElementById("authForm"),logout=document.getElementById("logoutBtn"),profileStatus=document.getElementById("profileOnlineStatus");
+  if(currentUser){
+    const name=profile.name||currentUser.email?.split("@")[0]||"Giocatore";
+    status.innerHTML=`<span class="onlineDot"></span><b>Connesso</b> · ${escapeHtml(name)}<br><small>${escapeHtml(currentUser.email||"")}</small>`;
+    form.classList.add("hidden");logout.classList.remove("hidden");
+    if(profileStatus)profileStatus.innerHTML=`<span class="onlineDot"></span>Account connesso · progressi sincronizzati online.`;
+  }else{
+    status.innerHTML='<span class="offlineDot"></span>Non hai ancora effettuato l\'accesso.';
+    form.classList.remove("hidden");logout.classList.add("hidden");
+    if(profileStatus)profileStatus.innerHTML='<span class="offlineDot"></span>Non connesso. Accedi per sincronizzare i progressi.';
+  }
+}
+function setAuthMode(mode){
+  const registerForm=document.getElementById("registerForm");
+  const loginForm=document.getElementById("loginForm");
+  const registerTab=document.getElementById("showRegisterBtn");
+  const loginTab=document.getElementById("showLoginBtn");
+  const isRegister=mode==="register";
+  registerForm.classList.toggle("hidden",!isRegister);
+  loginForm.classList.toggle("hidden",isRegister);
+  registerTab.classList.toggle("active",isRegister);
+  loginTab.classList.toggle("active",!isRegister);
+}
+async function registerAccount(){
+  const username=document.getElementById("authUsername").value.trim().slice(0,18);
+  const email=document.getElementById("authEmail").value.trim();
+  const password=document.getElementById("authPassword").value;
+  if(!username||!email||!password){alert("Inserisci username, email e password.");return;}
+  if(password.length<6){alert("La password deve avere almeno 6 caratteri.");return;}
+  const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{username}}});
+  if(error){alert("Registrazione non riuscita: "+error.message);return;}
+  localStorage.setItem("calcioQuizAuthEmail",email);
+  localStorage.setItem("calcioQuizAuthUsername",username);
+  profile.name=username;save();
+  if(data.session){await loadOnlineProfile(data.user);alert("Account creato e accesso effettuato! 🌐");}
+  else{
+    setAuthMode("login");
+    document.getElementById("loginUsername").value=username;
+    alert("Registrazione completata! Controlla la tua email e conferma l'account. Dopo la conferma entra con username e password.");
+  }
+}
+async function loginAccount(){
+  const username=document.getElementById("loginUsername").value.trim().slice(0,18);
+  const password=document.getElementById("loginPassword").value;
+  const email=localStorage.getItem("calcioQuizAuthEmail");
+  if(!username||!password){alert("Inserisci username e password.");return;}
+  if(!email){alert("Su questo dispositivo non è ancora stata salvata l'email dell'account. Registrati nuovamente oppure accedi una prima volta con l'email per salvarla.");return;}
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error){alert("Accesso non riuscito: "+error.message);return;}
+  localStorage.setItem("calcioQuizAuthEmail",data.user.email||email);
+  localStorage.setItem("calcioQuizAuthUsername",username);
+  await loadOnlineProfile(data.user);
+  alert("Accesso effettuato! 🌐");
+}
+async function logoutAccount(){
+  await supabaseClient.auth.signOut();
+  currentUser=null;onlineProfile=null;updateAuthUI();
+  alert("Sei uscito dall'account.");
+}
+async function renderGlobalLeaderboard(){
+  const box=document.getElementById("globalLeaderboard");
+  box.innerHTML='<div class="mini">Caricamento classifica globale...</div>';
+  const {data,error}=await supabaseClient.from("profiles").select("username,xp,level,wins,games").order("xp",{ascending:false}).limit(20);
+  if(error){box.innerHTML=`<div class="mini">Impossibile caricare la classifica globale.<br>${escapeHtml(error.message)}</div>`;return;}
+  if(!data?.length){box.innerHTML='<div class="mini">Ancora nessun giocatore online.</div>';return;}
+  box.innerHTML=data.map((x,i)=>`<div class="leader"><div class="place">#${i+1}</div><div class="leaderName">${escapeHtml(x.username||"Giocatore")}<small style="display:block;color:#8fae9b">Livello ${Number(x.level)||1} · ${Number(x.wins)||0} vittorie</small></div><div class="leaderScore">${Number(x.xp)||0} XP</div></div>`).join("");
+}
+
+function save(){localStorage.setItem("calcioQuizProfile",JSON.stringify(profile));localStorage.setItem("calcioQuizLeaderboard",JSON.stringify(leaderboard));}
+function level(){return Math.floor(profile.xp/500)+1}
+function levelProgress(){return profile.xp%500}
+function todayKey(){return new Date().toISOString().slice(0,10)}
+function dailyQuestion(){
+  const d=new Date(); const seed=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  return bank[seed%bank.length];
+}
+function updateDaily(){
+  const q=dailyQuestion(), done=profile.dailyDone===todayKey();
+  document.getElementById("dailyChallenge").innerHTML=`<div class="daily"><b>${done?"✅ Sfida completata!":"🎯 1 domanda speciale"}</b><br><span>${q[2]}</span><br><small>${done?"Torna domani per una nuova sfida.":"Ricompensa: 250 XP + 50 monete se rispondi correttamente."}</small></div>`;
+  document.getElementById("dailyBtn").disabled=done;
+  document.getElementById("dailyBtn").style.opacity=done?.55:1;
+}
+function achievements(){
+ const a=[
+  ["⚽","Prima partita","Completa una partita",profile.games>=1],
+  ["🔥","In serie","Raggiungi 5 di serie",profile.streak>=5],
+  ["💰","Collezionista","Raccogli 100 monete",profile.coins>=100],
+  ["⭐","500 XP","Raggiungi 500 XP",profile.xp>=500],
+  ["🏆","Campione","Vinci un 1 vs 1",profile.wins>=1],
+  ["🎯","Cecchino","Rispondi correttamente a 25 domande",profile.correct>=25]
+ ];
+ document.getElementById("achievements").innerHTML=a.map(x=>`<div class="achievement ${x[3]?"done":"locked"}"><span class="ico">${x[0]}</span><div><b>${x[1]}</b><small>${x[2]} ${x[3]?"✓":"🔒"}</small></div></div>`).join("");
+}
 function updateUI(){
- document.getElementById("nick").value=profile.name||"";
- const pct=Math.min(100,((profile.xp-levelXp(profile.level))/500)*100);
- document.getElementById("homeLevel").textContent=`Livello ${profile.level}`;
- document.getElementById("homeXp").style.width=pct+"%";
- document.getElementById("homeXpText").textContent=`${profile.xp} XP / ${levelXp(profile.level)+500} al prossimo livello`;
- document.getElementById("profXp").textContent=profile.xp;
- document.getElementById("profLevel").textContent=profile.level;
- document.getElementById("profCoins").textContent=profile.coins;
- document.getElementById("profWins").textContent=profile.wins;
- document.getElementById("profGames").textContent=profile.games;
- document.getElementById("profCorrect").textContent=profile.correct;
- document.getElementById("profLevelText").textContent=`Livello ${profile.level}`;
- document.getElementById("profXpBar").style.width=pct+"%";
- document.getElementById("profXpText").textContent=`${profile.xp} / ${levelXp(profile.level)+500} XP`;
+  const n=profile.name||"Giocatore";
+  document.getElementById("nick").value=profile.name||"";
+  document.getElementById("homeLevel").textContent="Livello "+level();
+  document.getElementById("homeXp").style.width=(levelProgress()/500*100)+"%";
+  document.getElementById("homeXpText").textContent=profile.xp+" XP · "+levelProgress()+"/500 al prossimo livello";
+  document.getElementById("profileName").textContent=n;
+  document.getElementById("profileLevel").textContent="Livello "+level();
+  document.getElementById("profileXp").style.width=(levelProgress()/500*100)+"%";
+  document.getElementById("profileXpText").textContent=profile.xp+" XP · "+levelProgress()+"/500";
+  document.getElementById("statGames").textContent=profile.games;
+  document.getElementById("statBest").textContent=profile.best;
+  document.getElementById("statCoins").textContent=profile.coins;
+  document.getElementById("statCorrect").textContent=profile.correct;
+  document.getElementById("statStreak").textContent=profile.streak;
+  document.getElementById("statWins").textContent=profile.wins;
+  document.getElementById("statBestStreak").textContent=profile.bestStreak||0;
+  updateDaily(); achievements(); updateAuthUI();
 }
-function buildButtons(id,items,fn){
- const box=document.getElementById(id);box.innerHTML="";
- items.forEach((x,i)=>{const b=document.createElement("button");b.type="button";b.textContent=x;b.className=(i===0?"selected":"");b.onclick=()=>{[...box.children].forEach(z=>z.classList.remove("selected"));b.classList.add("selected");fn(x)};box.appendChild(b)})
+function show(id){
+  ["home","quiz","duel","onlineLobby","onlineDuel","result","ranking","profile"].forEach(x=>document.getElementById(x).classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden"); updateUI();
+  if(id==="ranking"){renderLeaderboard();renderGlobalLeaderboard();}
 }
-function show(id){["home","quiz","duel","result","ranking","profile","onlineLobby","onlineDuel","daily"].forEach(x=>document.getElementById(x).classList.toggle("hidden",x!==id));window.scrollTo({top:0,behavior:"smooth"})}
-function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function buildButtons(id,arr,setter){
+ const el=document.getElementById(id);el.innerHTML="";
+ arr.forEach((x,i)=>{
+  const b=document.createElement("button");b.type="button";b.textContent=x;
+  b.onclick=()=>{setter(x);[...el.children].forEach(z=>z.classList.remove("selected"));b.classList.add("selected");};
+  el.appendChild(b);if(i===0)b.classList.add("selected");
+ });
+}
+function sound(ok=true){
+ try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();o.frequency.value=ok?740:180;o.type="sine";g.gain.value=.045;o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.12)}catch(e){}
+}
+function shuffle(a){return [...a].sort(()=>Math.random()-0.5)}
 function getPool(){
- let cat=selectedCat,diff=selectedDiff.toLowerCase().includes("facile")?"facile":selectedDiff.toLowerCase().includes("media")?"media":selectedDiff.toLowerCase().includes("difficile")?"difficile":"esperto";
- let pool=questions.filter(q=>(cat==="Misto"||q[0]===cat)&&(q[1]===diff||diff==="esperto"));
- if(pool.length<10)pool=questions.filter(q=>cat==="Misto"||q[0]===cat);
- return pool;
+ const cat=selectedCat.replace(/^\S+\s+/,"").trim(),diff=selectedDiff.replace(/^\S+\s+/,"").trim();
+ let pool=cat==="Misto"?bank:bank.filter(q=>q[0]===cat);
+ let by=pool.filter(q=>q[1]===diff);
+ if(by.length<10)by=by.concat(bank.filter(q=>q[1]===diff&&!by.includes(q)));
+ if(by.length<10)by=by.concat(pool.filter(q=>!by.includes(q)));
+ return by.length?by:bank;
 }
 function startQuiz(){
  profile.name=document.getElementById("nick").value.trim()||"Giocatore";
  save();
- if(selectedMode==="🌐 1 vs 1 Online"){
-   if(!currentUser){alert("Devi accedere con un account online prima di giocare 1 vs 1 Online.");return;}
-   show("onlineLobby");document.getElementById("onlineLobbyBox").innerHTML="";return;
- }
  if(selectedMode==="⚔️ 1 vs 1"){startDuel();return}
- quizQuestions=shuffle(getPool()).slice(0,10);quizIndex=0;score=0;show("quiz");showQuestion()
+ if(selectedMode==="🌐 1 vs 1 Online"){startOnlineLobby();return}
+ questions=shuffle(getPool()).slice(0,10);index=0;score=0;show("quiz");showQuestion();
+}
+function startDaily(){
+ if(profile.dailyDone===todayKey()){alert("Hai già completato la sfida di oggi. Torna domani! 🔥");return;}
+ profile.name=document.getElementById("nick").value.trim()||"Giocatore"; save();
+ dailyMode=true; questions=[dailyQuestion()]; index=0; score=0; show("quiz"); showDailyQuestion();
+}
+function showDailyQuestion(){
+ locked=false; clearInterval(interval); timer=20; const q=questions[0];
+ document.getElementById("counter").textContent="🔥 SFIDA"; document.getElementById("timer").textContent=timer; document.getElementById("score").textContent=0;
+ document.getElementById("fill").style.width="100%"; document.getElementById("catTag").textContent=q[0]+" · SFIDA DEL GIORNO"; document.getElementById("question").textContent=q[2]; document.getElementById("feedback").innerHTML="";
+ const ans=shuffle(q.slice(3).map((a,i)=>({a,correct:i===0}))),box=document.getElementById("answers"); box.innerHTML="";
+ ans.forEach(x=>{const b=document.createElement("button");b.className="answer";b.textContent=x.a;b.onclick=()=>answerDaily(b,x.correct,q[3]);box.appendChild(b)});
+ interval=setInterval(()=>{timer--;document.getElementById("timer").textContent=timer;if(timer<=0){clearInterval(interval);if(!locked)answerDaily(null,false,q[3],true)}},1000);
+}
+function answerDaily(btn,correct,correctText,timeout=false){
+ if(locked)return; locked=true; clearInterval(interval); sound(correct);
+ [...document.querySelectorAll("#answers .answer")].forEach(b=>{if(b.textContent===correctText)b.classList.add("correct")}); if(btn&&!correct)btn.classList.add("wrong");
+ if(correct){profile.xp+=250;profile.coins+=50;profile.correct++;profile.totalAnswers++;profile.streak++;profile.bestStreak=Math.max(profile.bestStreak||0,profile.streak);score=250;} else {profile.totalAnswers++;profile.streak=0;}
+ profile.dailyDone=todayKey(); save(); syncOnlineProfile();
+ document.getElementById("score").textContent=score; document.getElementById("feedback").innerHTML=correct?`<div class="feedback">🏆 SFIDA SUPERATA!<small>+250 XP · +50 monete</small></div>`:`<div class="feedback">✕ ${timeout?"TEMPO SCADUTO":"RISPOSTA SBAGLIATA"}<small>Risposta corretta: ${correctText}</small></div>`;
+ setTimeout(()=>{dailyMode=false;document.getElementById("finalScore").textContent=correct?"250 ⭐":"0 ⭐";document.getElementById("resultTitle").textContent=correct?"🔥 Sfida completata!":"🎯 Ci riprovi domani?";document.getElementById("finalText").innerHTML=`${profile.name||"Giocatore"}, sfida del giorno completata.`;document.getElementById("earnedXp").textContent=correct?"+250":"+0";document.getElementById("earnedCoins").textContent=correct?"+50":"+0";document.getElementById("finalStreak").textContent=profile.streak;show("result")},1400);
 }
 function showQuestion(){
- clearInterval(timer);timeLeft=15;
- const q=quizQuestions[quizIndex];
- document.getElementById("quizCat").textContent=q[0];
- document.getElementById("timer").textContent=timeLeft;
- document.getElementById("score").textContent=score;
- document.getElementById("progress").style.width=(quizIndex/quizQuestions.length*100)+"%";
- document.getElementById("question").textContent=q[2];
- const box=document.getElementById("answers");box.innerHTML="";
- shuffle(q.slice(3)).forEach(a=>{const b=document.createElement("button");b.className="answer";b.textContent=a;b.onclick=()=>answerSolo(b,a,q[3]);box.appendChild(b)});
- timer=setInterval(()=>{timeLeft--;document.getElementById("timer").textContent=timeLeft;if(timeLeft<=0){clearInterval(timer);answerSolo(null,null,q[3])}},1000)
+ locked=false;clearInterval(interval);timer=15;const q=questions[index];
+ document.getElementById("counter").textContent=(index+1)+"/10";
+ document.getElementById("timer").textContent=timer;document.getElementById("score").textContent=score;
+ document.getElementById("fill").style.width=(index/10*100)+"%";document.getElementById("catTag").textContent=q[0]+" · "+q[1];
+ document.getElementById("question").textContent=q[2];document.getElementById("feedback").innerHTML="";
+ const ans=shuffle(q.slice(3).map((a,i)=>({a,correct:i===0}))),box=document.getElementById("answers");box.innerHTML="";
+ ans.forEach(x=>{const b=document.createElement("button");b.className="answer";b.textContent=x.a;b.onclick=()=>answer(b,x.correct,q[3]);box.appendChild(b)});
+ interval=setInterval(()=>{timer--;document.getElementById("timer").textContent=timer;if(timer<=0){clearInterval(interval);if(!locked)answer(null,false,q[3],true)}},1000);
 }
-function answerSolo(btn,answer,correctText){
- clearInterval(timer);const correct=answer===correctText;
- if(correct){score+=Math.max(25,timeLeft*8);profile.correct++;profile.streak++;profile.bestStreak=Math.max(profile.bestStreak,profile.streak)}else{profile.streak=0}
- profile.totalAnswers++;
- document.querySelectorAll("#answers .answer").forEach(b=>{if(b.textContent===correctText)b.classList.add("correct")});
+function answer(btn,correct,correctText,timeout=false){
+ if(locked)return;locked=true;clearInterval(interval);sound(correct);
+ [...document.querySelectorAll("#answers .answer")].forEach(b=>{if(b.textContent===correctText)b.classList.add("correct")});
  if(btn&&!correct)btn.classList.add("wrong");
- document.getElementById("feedback").innerHTML=`<div class="feedback">${correct?"✓ CORRETTO":"✕ SBAGLIATO"}<small>Risposta: ${correctText}</small></div>`;
- setTimeout(()=>{quizIndex++;if(quizIndex>=quizQuestions.length)finishSolo();else showQuestion()},900)
+ const earned=correct?100+timer*5:0;score+=earned;profile.totalAnswers++;if(correct)profile.correct++;
+ document.getElementById("feedback").innerHTML=correct?`<div class="feedback">✓ RISPOSTA CORRETTA<small>+${earned} punti</small></div>`:`<div class="feedback">✕ ${timeout?"TEMPO SCADUTO":"RISPOSTA SBAGLIATA"}<small>Risposta corretta: ${correctText}</small></div>`;
+ setTimeout(()=>{index++;if(index<10)showQuestion();else finishSolo()},1800);
 }
-async function finishSolo(){
- const oldLevel=profile.level;
- profile.games++;profile.xp+=score;profile.coins+=Math.max(5,Math.floor(score/25));
- while(profile.xp>=profile.level*500){profile.xp-=profile.level*500;profile.level++}
- profile.best=Math.max(profile.best,score);
- leaderboard.unshift({name:profile.name||"Giocatore",score,date:new Date().toLocaleDateString("it-IT")});
- leaderboard=leaderboard.sort((a,b)=>b.score-a.score).slice(0,20);
- save();await syncOnlineProfile();
- document.getElementById("finalScore").textContent=score;
- document.getElementById("resultTitle").textContent=profile.level>oldLevel?"🎉 LEVEL UP!":"🏆 Quiz completato";
- document.getElementById("finalText").innerHTML=`${quizQuestions.length} domande · ${profile.correct} risposte corrette totali`;
- document.getElementById("earnedXp").textContent="+"+score;
- document.getElementById("earnedCoins").textContent="+"+Math.max(5,Math.floor(score/25));
- document.getElementById("finalStreak").textContent=profile.streak;
- show("result")
+function finishSolo(){
+ profile.games++;if(score>0)profile.streak++;else profile.streak=0; profile.bestStreak=Math.max(profile.bestStreak||0,profile.streak);
+ const earnedXp=Math.max(20,Math.floor(score/5)),earnedCoins=Math.max(5,Math.floor(score/25));
+ profile.xp+=earnedXp;profile.coins+=earnedCoins;if(score>profile.best)profile.best=score;
+ leaderboard.push({name:profile.name||"Giocatore",score,date:new Date().toLocaleDateString("it-IT")});
+ leaderboard.sort((a,b)=>b.score-a.score);leaderboard=leaderboard.slice(0,20);save(); syncOnlineProfile();
+ document.getElementById("finalScore").textContent=score+" ⭐";document.getElementById("resultTitle").textContent="🏁 Quiz completato!";
+ document.getElementById("finalText").innerHTML=`${profile.name||"Giocatore"}, hai completato 10 domande.<br><span class="pill">${selectedCat}</span><span class="pill">${selectedDiff}</span>`;
+ document.getElementById("earnedXp").textContent="+"+earnedXp;document.getElementById("earnedCoins").textContent="+"+earnedCoins;document.getElementById("finalStreak").textContent=profile.streak;
+ show("result");
 }
-async function startDaily(){
- profile.name=document.getElementById("nick").value.trim()||"Giocatore";save();
- quizQuestions=shuffle(questions).slice(0,5);quizIndex=0;score=0;show("quiz");showQuestion()
+function randomDuelCode(){
+ const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let out="";for(let i=0;i<5;i++)out+=chars[Math.floor(Math.random()*chars.length)];return out;
 }
-async function syncOnlineProfile(){
- if(!currentUser)return;
- const payload={username:profile.name||"Giocatore",xp:profile.xp,level:profile.level,coins:profile.coins,wins:profile.wins,games:profile.games,correct_answers:profile.correct,streak:profile.streak,best_streak:profile.bestStreak};
- const {data,error}=await supabaseClient.from("profiles").update(payload).eq("id",currentUser.id).select().maybeSingle();
- if(!error&&data)onlineProfile=data;
+function onlineQuestions(){
+ return shuffle(getPool()).slice(0,5).map(q=>({category:q[0],difficulty:q[1],question:q[2],options:q.slice(3),correct:q[3]}));
 }
-async function loadOnlineProfile(user){
- currentUser=user;
- const {data,error}=await supabaseClient.from("profiles").select("*").eq("id",user.id).maybeSingle();
- if(error){console.error(error);updateAuthUI();return}
- if(data){
-   onlineProfile=data;
-   profile.name=data.username||profile.name||"Giocatore";
-   profile.xp=Number(data.xp)||0;profile.level=Number(data.level)||1;profile.coins=Number(data.coins)||100;
-   profile.wins=Number(data.wins)||0;profile.games=Number(data.games)||0;profile.correct=Number(data.correct_answers)||0;profile.streak=Number(data.streak)||0;profile.bestStreak=Number(data.best_streak)||0;
-   save();
- }else{
-   await syncOnlineProfile();
- }
- updateAuthUI();updateUI();
+function startOnlineLobby(){
+ if(!currentUser){alert("Devi prima accedere al tuo account online.");return;}
+ show("onlineLobby");
+ document.getElementById("onlineLobbyBox").innerHTML='<div class="onlineWaiting">Scegli se creare una partita oppure entrare con un codice.</div>';
 }
-function updateAuthUI(){
- const status=document.getElementById("authStatus"),form=document.getElementById("authForm"),logout=document.getElementById("logoutBtn");
- if(currentUser){
-   status.innerHTML=`<span class="onlineDot"></span>Connesso · ${escapeHtml(profile.name||"Giocatore")}<br>${escapeHtml(currentUser.email||"")}`;
-   form.classList.add("hidden");logout.classList.remove("hidden");
- }else{
-   status.innerHTML='<span class="offlineDot"></span>Non hai ancora effettuato l\'accesso.';
-   form.classList.remove("hidden");logout.classList.add("hidden");
- }
-}
-async function registerAccount(){
- const username=document.getElementById("authUsername").value.trim()||"Giocatore";
- const email=document.getElementById("authEmail").value.trim();
- const password=document.getElementById("authPassword").value;
- if(!email||password.length<6){alert("Inserisci email e una password di almeno 6 caratteri.");return}
- const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{username}}});
- if(error){alert("Registrazione non riuscita: "+error.message);return}
- if(data.session){await loadOnlineProfile(data.user);alert("Registrazione completata e accesso effettuato!")}
- else{alert("Registrazione completata! Controlla la tua email e conferma l'account, poi accedi dal quiz.")}
-}
-async function loginAccount(){
- const email=document.getElementById("authEmail").value.trim();
- const password=document.getElementById("authPassword").value;
- if(!email||!password){alert("Inserisci email e password.");return}
- const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
- if(error){alert("Accesso non riuscito: "+error.message);return}
- await loadOnlineProfile(data.user);
-}
-async function logoutAccount(){await supabaseClient.auth.signOut();currentUser=null;onlineProfile=null;updateAuthUI()}
-async function renderGlobalLeaderboard(){
- const box=document.getElementById("globalLeaderboard");
- box.innerHTML="<div class='mini'>Caricamento classifica globale…</div>";
- const {data,error}=await supabaseClient.from("profiles").select("username,xp,level,wins").order("xp",{ascending:false}).limit(20);
- if(error){box.innerHTML=`<div class="mini">Errore classifica: ${escapeHtml(error.message)}</div>`;return}
- if(!data?.length){box.innerHTML="<div class='mini'>Nessun giocatore online ancora.</div>";return}
- box.innerHTML=data.map((x,i)=>`<div class="leader"><div class="place">#${i+1}</div><div class="leaderName">${escapeHtml(x.username||"Giocatore")}<small style="display:block;color:#8fae9b">Livello ${x.level||1} · ${x.wins||0} vittorie</small></div><div class="leaderScore">${x.xp||0} XP</div></div>`).join("");
-}
-function createCode(){return Math.random().toString(36).slice(2,7).toUpperCase()}
 async function createOnlineDuel(){
- if(!currentUser){alert("Accedi prima di creare una partita online.");return}
- let code=createCode();
- let exists=true;
- for(let i=0;i<5&&exists;i++){
-   const r=await supabaseClient.from("duels").select("id").eq("code",code).maybeSingle();
-   exists=!!r.data;if(exists)code=createCode();
+ if(!currentUser){alert("Accedi prima al tuo account.");return;}
+ const box=document.getElementById("onlineLobbyBox");
+ box.innerHTML='<div class="onlineWaiting">Creazione partita...</div>';
+ let code=randomDuelCode();
+ for(let i=0;i<5;i++){
+   const {data}=await supabaseClient.from("duels").select("id").eq("code",code).maybeSingle();
+   if(!data)break;
+   code=randomDuelCode();
  }
- const qs=shuffle(questions).slice(0,5).map(q=>({question:q[2],options:q.slice(3),correct:q[3]}));
- const {data,error}=await supabaseClient.from("duels").insert({code,host_id:currentUser.id,status:"waiting",questions:qs}).select().single();
- if(error){alert("Creazione partita non riuscita: "+error.message);return}
- onlineDuel=data;show("onlineLobby");
- document.getElementById("onlineLobbyBox").innerHTML=`<div class="onlineWaiting"><b>Codice partita</b><div class="duelCode">${escapeHtml(code)}</div><div>Invia questo codice al tuo avversario.</div><button type="button" class="restart" id="copyCodeBtn">📋 COPIA CODICE</button><div style="margin-top:10px">In attesa del secondo giocatore…</div></div>`;
- document.getElementById("copyCodeBtn").onclick=async()=>{try{await navigator.clipboard.writeText(code);alert("Codice copiato!")}catch(e){alert("Codice: "+code)}};
+ const qs=onlineQuestions();
+ const {data,error}=await supabaseClient.from("duels").insert({code,host_id:currentUser.id,status:"waiting",questions:qs}).select("*").single();
+ if(error){box.innerHTML=`<div class="onlineWaiting">Errore: ${escapeHtml(error.message)}</div>`;return;}
+ onlineDuel=data;
+ box.innerHTML=`<div class="onlineWaiting"><b>Partita creata!</b><div class="duelCode">${code}</div><div>Invia questo codice al tuo avversario.</div><div id="onlineWaitText" style="margin-top:8px">In attesa del secondo giocatore…</div></div>`;
  startOnlinePolling();
 }
 async function joinOnlineDuel(){
- if(!currentUser){alert("Accedi prima di entrare in una partita online.");return}
- const code=(prompt("Inserisci il codice della partita:")||"").trim().toUpperCase();
+ if(!currentUser){alert("Accedi prima al tuo account.");return;}
+ const code=(prompt("Inserisci il codice della partita:","")||"").trim().toUpperCase();
  if(!code)return;
  const box=document.getElementById("onlineLobbyBox");box.innerHTML='<div class="onlineWaiting">Ingresso nella partita...</div>';
  const {data,error}=await supabaseClient.rpc("join_duel",{p_code:code});
- if(error){box.innerHTML=`<div class="onlineWaiting">${escapeHtml(error.message)}</div>`;return}
+ if(error){box.innerHTML=`<div class="onlineWaiting">${escapeHtml(error.message)}</div>`;return;}
  onlineDuel=data;show("onlineDuel");onlineAnswered=false;onlineLastQuestion=-1;renderOnlineDuel();startOnlinePolling();
 }
 function startOnlinePolling(){
@@ -441,14 +585,14 @@ function startOnlinePolling(){
  onlinePoll=setInterval(async()=>{
    if(!onlineDuel?.id)return;
    const {data,error}=await supabaseClient.from("duels").select("*").eq("id",onlineDuel.id).maybeSingle();
-   if(!error&&data){onlineDuel=data;if(data.status==="playing"){show("onlineDuel");renderOnlineDuel();}else if(data.status==="finished"){finishOnlineDuel()}}
+   if(!error&&data){onlineDuel=data;if(data.status==="playing"){show("onlineDuel");renderOnlineDuel();}else if(data.status==="finished"){finishOnlineDuel();}}
  },1500);
 }
-function stopOnlinePolling(){if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null}}
+function stopOnlinePolling(){if(onlinePoll){clearInterval(onlinePoll);onlinePoll=null;}}
 function renderOnlineDuel(){
  if(!onlineDuel)return;
  const isHost=onlineDuel.host_id===currentUser?.id;
- const hostName=isHost?(profile.name||"Tu"):"Avversario";
+ const hostName=onlineDuel.host_id===currentUser?.id?(profile.name||"Tu"):"Avversario";
  const guestName=onlineDuel.guest_id===currentUser?.id?(profile.name||"Tu"):"Avversario";
  document.getElementById("onlineHostName").textContent=hostName;
  document.getElementById("onlineGuestName").textContent=guestName;
@@ -460,7 +604,7 @@ function renderOnlineDuel(){
    return;
  }
  const qi=Number(onlineDuel.current_question)||0;
- if(qi>=5||onlineDuel.status==="finished"){finishOnlineDuel();return}
+ if(qi>=5||onlineDuel.status==="finished"){finishOnlineDuel();return;}
  const q=onlineDuel.questions?.[qi];if(!q)return;
  document.getElementById("onlineDuelQ").textContent=`Domanda ${qi+1}/5`;
  document.getElementById("onlineDuelQuestion").textContent=q.question;
@@ -468,10 +612,11 @@ function renderOnlineDuel(){
  const bothAnswered=onlineDuel.host_answer!==null&&onlineDuel.guest_answer!==null;
  if(myAnswer!==null){
    document.getElementById("onlineAnswerState").textContent=bothAnswered?"Entrambi avete risposto":"Risposta inviata…";
+   if(onlineLastQuestion!==qi){onlineLastQuestion=qi;onlineAnswered=true;}
    document.getElementById("onlineDuelAnswers").innerHTML=q.options.map(a=>`<button class="answer" disabled>${escapeHtml(a)}</button>`).join("");
    return;
  }
- document.getElementById("onlineAnswerState").textContent="Tocca a te";
+ onlineAnswered=false;onlineLastQuestion=qi;document.getElementById("onlineAnswerState").textContent="Tocca a te";
  const box=document.getElementById("onlineDuelAnswers");box.innerHTML="";
  shuffle(q.options).forEach(a=>{const b=document.createElement("button");b.className="answer";b.textContent=a;b.onclick=()=>submitOnlineAnswer(a);box.appendChild(b)});
  document.getElementById("onlineDuelFeedback").innerHTML="";
@@ -482,7 +627,7 @@ async function submitOnlineAnswer(answerText){
  const qi=Number(onlineDuel.current_question)||0;
  document.getElementById("onlineAnswerState").textContent="Invio risposta…";
  const {data,error}=await supabaseClient.rpc("submit_duel_answer",{p_duel_id:onlineDuel.id,p_answer:answerText,p_question_index:qi});
- if(error){onlineAnswered=false;document.getElementById("onlineAnswerState").textContent="Errore";alert(error.message);return}
+ if(error){onlineAnswered=false;document.getElementById("onlineAnswerState").textContent="Errore";alert(error.message);return;}
  onlineDuel=data.duel;
  document.getElementById("onlineDuelFeedback").innerHTML=`<div class="feedback">${data.correct?"✓ RISPOSTA CORRETTA":"✕ RISPOSTA SBAGLIATA"}<small>Risposta corretta: ${escapeHtml(data.correct_answer)}</small></div>`;
  renderOnlineDuel();
@@ -491,6 +636,7 @@ async function finishOnlineDuel(){
  if(!onlineDuel)return;
  stopOnlinePolling();
  const winnerId=onlineDuel.winner_id;
+ const isHost=onlineDuel.host_id===currentUser?.id;
  const myWin=winnerId===currentUser?.id;
  const tie=!winnerId;
  document.getElementById("finalScore").textContent=`${Number(onlineDuel.host_score)||0} - ${Number(onlineDuel.guest_score)||0}`;
@@ -500,26 +646,24 @@ async function finishOnlineDuel(){
  document.getElementById("earnedCoins").textContent=tie?"+10":(myWin?"+25":"+10");
  document.getElementById("finalStreak").textContent=profile.streak||0;
  show("result");
- const finished=onlineDuel;
  onlineDuel=null;onlineAnswered=false;onlineLastQuestion=-1;
  await loadOnlineProfile(currentUser);
  await renderGlobalLeaderboard();
 }
 function startDuel(){
  const p2=prompt("Nome del secondo giocatore:","Avversario")||"Avversario";
- profile.name=document.getElementById("nick").value.trim()||"Giocatore";save();
+ profile.name=document.getElementById("nick").value.trim()||"Giocatore 1";save();
  duelQuestions=shuffle(getPool()).slice(0,5);duelIndex=0;duelTurn=0;duelScores=[0,0];duelLocked=false;profile._p2=p2;show("duel");showDuelQuestion();
 }
 function showDuelQuestion(){
  duelLocked=false;const q=duelQuestions[duelIndex];document.getElementById("p1Name").textContent=profile.name;document.getElementById("p2Name").textContent=profile._p2;
  document.getElementById("p1Score").textContent=duelScores[0];document.getElementById("p2Score").textContent=duelScores[1];
- document.getElementById("duelQ").textContent=(duelIndex+1)+"/5";document.getElementById("duelTurn").textContent=(duelTurn===0?profile.name:profile._p2)+", tocca a te!";
- document.getElementById("duelQuestion").textContent=q[2];
+ document.getElementById("duelQ").textContent=(duelIndex+1)+"/5";document.getElementById("duelQuestion").textContent=(duelTurn===0?profile.name:profile._p2)+", tocca a te!";
  const box=document.getElementById("duelAnswers");box.innerHTML="";document.getElementById("duelFeedback").innerHTML="";
  shuffle(q.slice(3)).forEach(a=>{const b=document.createElement("button");b.className="answer";b.textContent=a;b.onclick=()=>duelAnswer(b,a===q[3],q[3]);box.appendChild(b)});
 }
 function duelAnswer(btn,correct,correctText){
- if(duelLocked)return;duelLocked=true;if(correct)duelScores[duelTurn]+=100;
+ if(duelLocked)return;duelLocked=true;sound(correct);if(correct)duelScores[duelTurn]+=100;
  [...document.querySelectorAll("#duelAnswers .answer")].forEach(b=>{if(b.textContent===correctText)b.classList.add("correct")});
  if(btn&&!correct)btn.classList.add("wrong");
  document.getElementById("duelFeedback").innerHTML=`<div class="feedback">${correct?"✓ CORRETTO":"✕ SBAGLIATO"}<small>Risposta: ${correctText}</small></div>`;
@@ -528,7 +672,7 @@ function duelAnswer(btn,correct,correctText){
 function finishDuel(){
  const winner=duelScores[0]===duelScores[1]?"Pareggio":(duelScores[0]>duelScores[1]?profile.name:profile._p2);
  if(winner===profile.name){profile.wins++;profile.xp+=150;profile.coins+=25}else{profile.xp+=50;profile.coins+=10}
- profile.games++;save();syncOnlineProfile();
+ profile.games++;save(); syncOnlineProfile();
  document.getElementById("finalScore").textContent=`${duelScores[0]} - ${duelScores[1]}`;
  document.getElementById("resultTitle").textContent=winner==="Pareggio"?"🤝 Pareggio!":`🏆 Vince ${winner}`;
  document.getElementById("finalText").innerHTML=`${profile.name} vs ${profile._p2}<br>5 domande · modalità locale 1 vs 1`;
@@ -542,27 +686,36 @@ function renderLeaderboard(){
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 document.getElementById("nick").addEventListener("input",e=>{profile.name=e.target.value.slice(0,18);save();updateUI()});
 document.getElementById("nick").addEventListener("blur",()=>{if(currentUser)syncOnlineProfile()});
+document.getElementById("showRegisterBtn").onclick=()=>setAuthMode("register");
+document.getElementById("showLoginBtn").onclick=()=>setAuthMode("login");
 document.getElementById("registerBtn").onclick=registerAccount;
 document.getElementById("loginBtn").onclick=loginAccount;
 document.getElementById("logoutBtn").onclick=logoutAccount;
-supabaseClient.auth.onAuthStateChange(async(event,session)=>{
- if(session?.user){await loadOnlineProfile(session.user)}
- else{currentUser=null;onlineProfile=null;updateAuthUI()}
+supabaseClient.auth.onAuthStateChange(async (event,session)=>{
+  if(session?.user){
+    await loadOnlineProfile(session.user);
+  }else{
+    currentUser=null;onlineProfile=null;updateAuthUI();
+  }
 });
-supabaseClient.auth.getSession().then(({data})=>{if(data.session)loadOnlineProfile(data.session.user);else updateAuthUI()});
+supabaseClient.auth.getSession().then(({data})=>{
+  if(data.session)loadOnlineProfile(data.session.user);else updateAuthUI();
+});
 buildButtons("categories",categories,x=>selectedCat=x);buildButtons("difficulties",diffs,x=>selectedDiff=x);buildButtons("modes",modes,x=>selectedMode=x);
 document.getElementById("startBtn").onclick=startQuiz;
 document.getElementById("createOnlineBtn").onclick=createOnlineDuel;
 document.getElementById("joinOnlineBtn").onclick=joinOnlineDuel;
 document.getElementById("cancelOnlineBtn").onclick=()=>{stopOnlinePolling();onlineDuel=null;show("home")};
 document.getElementById("dailyBtn").onclick=startDaily;
-document.getElementById("homeNav").onclick=()=>show("home");
-document.getElementById("rankNav").onclick=()=>{show("ranking");renderGlobalLeaderboard();renderLeaderboard()};
-document.getElementById("statsNav").onclick=()=>show("profile");
+document.getElementById("homeNav").onclick=()=>show("home");document.getElementById("rankNav").onclick=()=>{show("ranking");renderGlobalLeaderboard()};document.getElementById("statsNav").onclick=()=>show("profile");
 document.getElementById("againBtn").onclick=()=>show("home");
-document.getElementById("shareBtn").onclick=async()=>{const text=`⚽ Calcio Quiz\nHo fatto ${document.getElementById("finalScore").textContent}! 🏆`;try{if(navigator.share)await navigator.share({title:"Calcio Quiz",text});else{await navigator.clipboard.writeText(text);alert("Risultato copiato!")}}catch(e){}};
+document.getElementById("shareBtn").onclick=async()=>{const text=`⚽ Calcio Quiz\\nHo fatto ${document.getElementById("finalScore").textContent}! 🏆`;try{if(navigator.share)await navigator.share({title:"Calcio Quiz",text});else{await navigator.clipboard.writeText(text);alert("Risultato copiato!");}}catch(e){}};
 document.getElementById("clearRankBtn").onclick=()=>{if(confirm("Vuoi azzerare la classifica locale?")){leaderboard=[];save();renderLeaderboard()}};
-updateUI();updateAuthUI();renderLeaderboard();
+const rememberedUsername=localStorage.getItem("calcioQuizAuthUsername")||"";
+document.getElementById("loginUsername").value=rememberedUsername;
+setAuthMode("register");
+updateUI();
+updateAuthUI();
 </script>
 </body>
 </html>
