@@ -36,6 +36,7 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
 .flash{animation:pop .35s ease}@keyframes pop{0%{transform:scale(.95);opacity:.5}100%{transform:scale(1);opacity:1}}
 .shake{animation:shake .3s}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 .achievement{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #234533}.achievement:last-child{border-bottom:0}.achievement .ico{font-size:25px}.achievement small{display:block;color:var(--muted);margin-top:3px}.done{opacity:1}.locked{opacity:.42}.daily{background:linear-gradient(135deg,#173b25,#10291a);border:1px solid #3f7652;border-radius:15px;padding:14px}.daily b{color:var(--gold)}
+.authGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.authStatus{padding:11px 13px;border-radius:12px;background:#07170e;border:1px solid #315d43;color:#bfe5cd;font-size:13px;line-height:1.4}.authBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.authBtns button{padding:11px 8px}.authBtns .danger{background:#3b1820;border-color:#70343f}.onlineDot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#57e59a;margin-right:6px}.offlineDot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#888;margin-right:6px}.globalRank{margin-top:10px}
 @media(max-width:390px){.grid{grid-template-columns:1fr}.question{font-size:20px}.nav button{font-size:11px}}
 </style>
 </head>
@@ -43,6 +44,25 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
 <div class="app">
   <div class="logo">⚽ CALCIO QUIZ</div>
   <div class="sub">Sfida le tue conoscenze. Sali di livello. 🏆</div>
+
+  <div class="card" id="authCard">
+    <h2>🌐 Account online</h2>
+    <div class="mini" id="authStatus"><span class="offlineDot"></span>Non hai ancora effettuato l'accesso.</div>
+    <div id="authForm" style="margin-top:12px">
+      <label>Username</label>
+      <input id="authUsername" maxlength="18" placeholder="Il tuo nome nel gioco">
+      <div class="authGrid" style="margin-top:9px">
+        <div><label>Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="tua@email.it"></div>
+        <div><label>Password</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Almeno 6 caratteri"></div>
+      </div>
+      <div class="authBtns">
+        <button type="button" id="registerBtn">📝 REGISTRATI</button>
+        <button type="button" id="loginBtn">🔐 ACCEDI</button>
+      </div>
+    </div>
+    <button type="button" class="restart hidden" id="logoutBtn">🚪 ESCI DALL'ACCOUNT</button>
+    <div class="mini" style="margin-top:9px">Con l'account puoi salvare i progressi online e comparire nella classifica globale.</div>
+  </div>
 
   <div class="nav">
     <button type="button" id="homeNav">🏠 Gioca</button>
@@ -54,7 +74,7 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
     <div class="card">
       <label>Nickname</label>
       <input id="nick" maxlength="18" placeholder="Inserisci il tuo nome">
-      <div class="mini">Il nome e i progressi vengono salvati solo su questo dispositivo.</div>
+      <div class="mini">Il nome e i progressi vengono salvati localmente; con l'account puoi sincronizzarli online.</div>
     </div>
 
     <div class="card">
@@ -117,10 +137,15 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
 
   <section id="ranking" class="hidden">
     <div class="card">
-      <h2>🏆 Classifica locale</h2>
-      <div class="mini" style="margin-bottom:12px">I punteggi vengono salvati su questo dispositivo.</div>
+      <h2>🌐 Classifica globale XP</h2>
+      <div class="mini" style="margin-bottom:12px">I giocatori con account online condividono questa classifica.</div>
+      <div id="globalLeaderboard"><div class="mini">Caricamento classifica globale...</div></div>
+    </div>
+    <div class="card">
+      <h2>📱 Classifica locale</h2>
+      <div class="mini" style="margin-bottom:12px">I punteggi delle partite restano anche su questo dispositivo.</div>
       <div id="leaderboard"></div>
-      <button class="restart" id="clearRankBtn">🗑️ Azzera classifica</button>
+      <button class="restart" id="clearRankBtn">🗑️ Azzera classifica locale</button>
     </div>
   </section>
 
@@ -140,6 +165,11 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
         <div class="stat"><b id="statStreak">0</b><span>Serie attuale</span></div>
         <div class="stat"><b id="statWins">0</b><span>Vittorie 1v1</span></div>
       </div>
+      <div class="mini" style="margin-top:10px">Miglior serie: <b id="statBestStreak">0</b></div>
+    </div>
+    <div class="card">
+      <h2>🌐 Stato online</h2>
+      <div class="mini" id="profileOnlineStatus">Non connesso</div>
     </div>
     <div class="card">
       <h2>🔥 Sfida del giorno</h2>
@@ -153,7 +183,14 @@ button:active{transform:scale(.98)}button:hover{background:#215337}.selected{bac
   </section>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL = "https://cofwxxuipozotdvyhdll.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_nyZNfMlz3ahR_pgi6b5kLA_56TH_XPz";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+let currentUser = null;
+let onlineProfile = null;
+
 const categories = ["🌍 Misto","🇮🇹 Serie A","🇪🇺 Champions League","🌎 Mondiali","🏆 Europei","🇬🇧 Premier League","🇪🇸 La Liga","🇩🇪 Bundesliga","🇫🇷 Ligue 1","👤 Giocatori","🏟️ Squadre","📜 Storia del calcio","🥇 Record e statistiche"];
 const diffs = ["🟢 Facile","🟡 Media","🔴 Difficile","⚫ Esperto"];
 const modes = ["🎮 Solo","⚔️ 1 vs 1"];
@@ -227,10 +264,98 @@ const bank = [
 ["Record e statistiche","Esperto","Chi detiene il record di presenze ai Mondiali?","Lionel Messi","Lothar Matthäus","Miroslav Klose","Cafu"]
 ];
 
-const defaultProfile={name:"",xp:0,coins:0,games:0,best:0,correct:0,streak:0,wins:0,totalAnswers:0,dailyDone:""};
+const defaultProfile={name:"",xp:0,coins:0,games:0,best:0,correct:0,streak:0,bestStreak:0,wins:0,totalAnswers:0,dailyDone:""};
 let profile=JSON.parse(localStorage.getItem("calcioQuizProfile")||"null")||{...defaultProfile};
 profile={...defaultProfile,...profile};
 let leaderboard=JSON.parse(localStorage.getItem("calcioQuizLeaderboard")||"[]");
+
+async function syncOnlineProfile(){
+  if(!currentUser)return;
+  const username=(profile.name||currentUser.email?.split("@")[0]||"Giocatore").slice(0,18);
+  const payload={
+    username,
+    xp:profile.xp||0,
+    level:level(),
+    coins:profile.coins||0,
+    wins:profile.wins||0,
+    games:profile.games||0,
+    correct_answers:profile.correct||0,
+    streak:profile.streak||0,
+    best_streak:profile.bestStreak||profile.streak||0
+  };
+  const {error}=await supabaseClient.from("profiles").update(payload).eq("id",currentUser.id);
+  if(error)console.warn("Sync profilo online:",error.message);
+}
+async function loadOnlineProfile(user){
+  currentUser=user;
+  const {data,error}=await supabaseClient.from("profiles").select("*").eq("id",user.id).maybeSingle();
+  if(error){console.warn("Caricamento profilo:",error.message);return;}
+  if(data){
+    onlineProfile=data;
+    profile.name=data.username||profile.name||user.email?.split("@")[0]||"Giocatore";
+    profile.xp=Number(data.xp)||0;
+    profile.coins=Number(data.coins)||0;
+    profile.games=Number(data.games)||0;
+    profile.correct=Number(data.correct_answers)||0;
+    profile.streak=Number(data.streak)||0;
+    profile.bestStreak=Number(data.best_streak)||profile.streak||0;
+    profile.wins=Number(data.wins)||0;
+    save();
+  }else{
+    await supabaseClient.from("profiles").upsert({id:user.id,username:profile.name||user.email?.split("@")[0]||"Giocatore"});
+    await syncOnlineProfile();
+  }
+  updateUI();
+  updateAuthUI();
+}
+function updateAuthUI(){
+  const status=document.getElementById("authStatus"),form=document.getElementById("authForm"),logout=document.getElementById("logoutBtn"),profileStatus=document.getElementById("profileOnlineStatus");
+  if(currentUser){
+    const name=profile.name||currentUser.email?.split("@")[0]||"Giocatore";
+    status.innerHTML=`<span class="onlineDot"></span><b>Connesso</b> · ${escapeHtml(name)}<br><small>${escapeHtml(currentUser.email||"")}</small>`;
+    form.classList.add("hidden");logout.classList.remove("hidden");
+    if(profileStatus)profileStatus.innerHTML=`<span class="onlineDot"></span>Account connesso · progressi sincronizzati online.`;
+  }else{
+    status.innerHTML='<span class="offlineDot"></span>Non hai ancora effettuato l\'accesso.';
+    form.classList.remove("hidden");logout.classList.add("hidden");
+    if(profileStatus)profileStatus.innerHTML='<span class="offlineDot"></span>Non connesso. Accedi per sincronizzare i progressi.';
+  }
+}
+async function registerAccount(){
+  const username=document.getElementById("authUsername").value.trim().slice(0,18);
+  const email=document.getElementById("authEmail").value.trim();
+  const password=document.getElementById("authPassword").value;
+  if(!username||!email||!password){alert("Inserisci username, email e password.");return;}
+  if(password.length<6){alert("La password deve avere almeno 6 caratteri.");return;}
+  const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{username}}});
+  if(error){alert("Registrazione non riuscita: "+error.message);return;}
+  profile.name=username;save();
+  if(data.session){await loadOnlineProfile(data.user);}else{
+    alert("Registrazione completata! Controlla la tua email e conferma l'account, poi accedi dal quiz.");
+  }
+}
+async function loginAccount(){
+  const email=document.getElementById("authEmail").value.trim();
+  const password=document.getElementById("authPassword").value;
+  if(!email||!password){alert("Inserisci email e password.");return;}
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error){alert("Accesso non riuscito: "+error.message);return;}
+  await loadOnlineProfile(data.user);
+  alert("Accesso effettuato! 🌐");
+}
+async function logoutAccount(){
+  await supabaseClient.auth.signOut();
+  currentUser=null;onlineProfile=null;updateAuthUI();
+  alert("Sei uscito dall'account.");
+}
+async function renderGlobalLeaderboard(){
+  const box=document.getElementById("globalLeaderboard");
+  box.innerHTML='<div class="mini">Caricamento classifica globale...</div>';
+  const {data,error}=await supabaseClient.from("profiles").select("username,xp,level,wins,games").order("xp",{ascending:false}).limit(20);
+  if(error){box.innerHTML=`<div class="mini">Impossibile caricare la classifica globale.<br>${escapeHtml(error.message)}</div>`;return;}
+  if(!data?.length){box.innerHTML='<div class="mini">Ancora nessun giocatore online.</div>';return;}
+  box.innerHTML=data.map((x,i)=>`<div class="leader"><div class="place">#${i+1}</div><div class="leaderName">${escapeHtml(x.username||"Giocatore")}<small style="display:block;color:#8fae9b">Livello ${Number(x.level)||1} · ${Number(x.wins)||0} vittorie</small></div><div class="leaderScore">${Number(x.xp)||0} XP</div></div>`).join("");
+}
 
 function save(){localStorage.setItem("calcioQuizProfile",JSON.stringify(profile));localStorage.setItem("calcioQuizLeaderboard",JSON.stringify(leaderboard));}
 function level(){return Math.floor(profile.xp/500)+1}
@@ -273,12 +398,13 @@ function updateUI(){
   document.getElementById("statCorrect").textContent=profile.correct;
   document.getElementById("statStreak").textContent=profile.streak;
   document.getElementById("statWins").textContent=profile.wins;
-  updateDaily(); achievements();
+  document.getElementById("statBestStreak").textContent=profile.bestStreak||0;
+  updateDaily(); achievements(); updateAuthUI();
 }
 function show(id){
   ["home","quiz","duel","result","ranking","profile"].forEach(x=>document.getElementById(x).classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden"); updateUI();
-  if(id==="ranking")renderLeaderboard();
+  if(id==="ranking"){renderLeaderboard();renderGlobalLeaderboard();}
 }
 function buildButtons(id,arr,setter){
  const el=document.getElementById(id);el.innerHTML="";
@@ -322,8 +448,8 @@ function showDailyQuestion(){
 function answerDaily(btn,correct,correctText,timeout=false){
  if(locked)return; locked=true; clearInterval(interval); sound(correct);
  [...document.querySelectorAll("#answers .answer")].forEach(b=>{if(b.textContent===correctText)b.classList.add("correct")}); if(btn&&!correct)btn.classList.add("wrong");
- if(correct){profile.xp+=250;profile.coins+=50;profile.correct++;profile.totalAnswers++;profile.streak++;score=250;} else {profile.totalAnswers++;profile.streak=0;}
- profile.dailyDone=todayKey(); save();
+ if(correct){profile.xp+=250;profile.coins+=50;profile.correct++;profile.totalAnswers++;profile.streak++;profile.bestStreak=Math.max(profile.bestStreak||0,profile.streak);score=250;} else {profile.totalAnswers++;profile.streak=0;}
+ profile.dailyDone=todayKey(); save(); syncOnlineProfile();
  document.getElementById("score").textContent=score; document.getElementById("feedback").innerHTML=correct?`<div class="feedback">🏆 SFIDA SUPERATA!<small>+250 XP · +50 monete</small></div>`:`<div class="feedback">✕ ${timeout?"TEMPO SCADUTO":"RISPOSTA SBAGLIATA"}<small>Risposta corretta: ${correctText}</small></div>`;
  setTimeout(()=>{dailyMode=false;document.getElementById("finalScore").textContent=correct?"250 ⭐":"0 ⭐";document.getElementById("resultTitle").textContent=correct?"🔥 Sfida completata!":"🎯 Ci riprovi domani?";document.getElementById("finalText").innerHTML=`${profile.name||"Giocatore"}, sfida del giorno completata.`;document.getElementById("earnedXp").textContent=correct?"+250":"+0";document.getElementById("earnedCoins").textContent=correct?"+50":"+0";document.getElementById("finalStreak").textContent=profile.streak;show("result")},1400);
 }
@@ -346,11 +472,11 @@ function answer(btn,correct,correctText,timeout=false){
  setTimeout(()=>{index++;if(index<10)showQuestion();else finishSolo()},1800);
 }
 function finishSolo(){
- profile.games++;if(score>0)profile.streak++;else profile.streak=0;
+ profile.games++;if(score>0)profile.streak++;else profile.streak=0; profile.bestStreak=Math.max(profile.bestStreak||0,profile.streak);
  const earnedXp=Math.max(20,Math.floor(score/5)),earnedCoins=Math.max(5,Math.floor(score/25));
  profile.xp+=earnedXp;profile.coins+=earnedCoins;if(score>profile.best)profile.best=score;
  leaderboard.push({name:profile.name||"Giocatore",score,date:new Date().toLocaleDateString("it-IT")});
- leaderboard.sort((a,b)=>b.score-a.score);leaderboard=leaderboard.slice(0,20);save();
+ leaderboard.sort((a,b)=>b.score-a.score);leaderboard=leaderboard.slice(0,20);save(); syncOnlineProfile();
  document.getElementById("finalScore").textContent=score+" ⭐";document.getElementById("resultTitle").textContent="🏁 Quiz completato!";
  document.getElementById("finalText").innerHTML=`${profile.name||"Giocatore"}, hai completato 10 domande.<br><span class="pill">${selectedCat}</span><span class="pill">${selectedDiff}</span>`;
  document.getElementById("earnedXp").textContent="+"+earnedXp;document.getElementById("earnedCoins").textContent="+"+earnedCoins;document.getElementById("finalStreak").textContent=profile.streak;
@@ -378,7 +504,7 @@ function duelAnswer(btn,correct,correctText){
 function finishDuel(){
  const winner=duelScores[0]===duelScores[1]?"Pareggio":(duelScores[0]>duelScores[1]?profile.name:profile._p2);
  if(winner===profile.name){profile.wins++;profile.xp+=150;profile.coins+=25}else{profile.xp+=50;profile.coins+=10}
- profile.games++;save();
+ profile.games++;save(); syncOnlineProfile();
  document.getElementById("finalScore").textContent=`${duelScores[0]} - ${duelScores[1]}`;
  document.getElementById("resultTitle").textContent=winner==="Pareggio"?"🤝 Pareggio!":`🏆 Vince ${winner}`;
  document.getElementById("finalText").innerHTML=`${profile.name} vs ${profile._p2}<br>5 domande · modalità locale 1 vs 1`;
@@ -391,6 +517,20 @@ function renderLeaderboard(){
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 document.getElementById("nick").addEventListener("input",e=>{profile.name=e.target.value.slice(0,18);save();updateUI()});
+document.getElementById("nick").addEventListener("blur",()=>{if(currentUser)syncOnlineProfile()});
+document.getElementById("registerBtn").onclick=registerAccount;
+document.getElementById("loginBtn").onclick=loginAccount;
+document.getElementById("logoutBtn").onclick=logoutAccount;
+supabaseClient.auth.onAuthStateChange(async (event,session)=>{
+  if(session?.user){
+    await loadOnlineProfile(session.user);
+  }else{
+    currentUser=null;onlineProfile=null;updateAuthUI();
+  }
+});
+supabaseClient.auth.getSession().then(({data})=>{
+  if(data.session)loadOnlineProfile(data.session.user);else updateAuthUI();
+});
 buildButtons("categories",categories,x=>selectedCat=x);buildButtons("difficulties",diffs,x=>selectedDiff=x);buildButtons("modes",modes,x=>selectedMode=x);
 document.getElementById("startBtn").onclick=startQuiz;
 document.getElementById("dailyBtn").onclick=startDaily;
@@ -399,6 +539,7 @@ document.getElementById("againBtn").onclick=()=>show("home");
 document.getElementById("shareBtn").onclick=async()=>{const text=`⚽ Calcio Quiz\\nHo fatto ${document.getElementById("finalScore").textContent}! 🏆`;try{if(navigator.share)await navigator.share({title:"Calcio Quiz",text});else{await navigator.clipboard.writeText(text);alert("Risultato copiato!");}}catch(e){}};
 document.getElementById("clearRankBtn").onclick=()=>{if(confirm("Vuoi azzerare la classifica locale?")){leaderboard=[];save();renderLeaderboard()}};
 updateUI();
+updateAuthUI();
 </script>
 </body>
 </html>
