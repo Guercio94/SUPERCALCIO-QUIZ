@@ -1,0 +1,24 @@
+{
+  "name": "Super Calcio",
+  "short_name": "Super Calcio",
+  "description": "Quiz di calcio e sfide 1 VS 1 online.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#04120b",
+  "theme_color": "#07170e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
